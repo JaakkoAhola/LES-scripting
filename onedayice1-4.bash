@@ -1,0 +1,5 @@
+#!bin/bash
+isoT=86400. testinumero=v5.2_OneDay ice=1.0  iradtyp=5 case_name="isdac" jaakkoNL=false th00=263. sound_in=sound_in3.5 LVL=5 submit=true exe=les.mpi.Jaakko.JJAv5.2.intel.fast dim3=true ${SCRIPT}/testiajot.bash
+isoT=86400. testinumero=v5.2_OneDay ice=2.0  iradtyp=5 case_name="isdac" jaakkoNL=false th00=263. sound_in=sound_in3.5 LVL=5 submit=true exe=les.mpi.Jaakko.JJAv5.2.intel.fast dim3=true ${SCRIPT}/testiajot.bash
+isoT=86400. testinumero=v5.2_OneDay ice=3.0  iradtyp=5 case_name="isdac" jaakkoNL=false th00=263. sound_in=sound_in3.5 LVL=5 submit=true exe=les.mpi.Jaakko.JJAv5.2.intel.fast dim3=true ${SCRIPT}/testiajot.bash
+isoT=86400. testinumero=v5.2_OneDay ice=4.0  iradtyp=5 case_name="isdac" jaakkoNL=false th00=263. sound_in=sound_in3.5 LVL=5 submit=true exe=les.mpi.Jaakko.JJAv5.2.intel.fast dim3=true ${SCRIPT}/testiajot.bash
