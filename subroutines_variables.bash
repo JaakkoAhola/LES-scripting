@@ -193,6 +193,30 @@ function postprosessoiinteractive {
 
 }
 
+function viimeksimuutettu {
+
+    simulation=$1
+    outputname=$2
+    folderROOT=$3
+    
+    timeParam=${timeParam:-3600}
+    
+    aika=$(date +%s)
+        
+    viimeks=$(find ${simulation}/ -printf "%T@\n" | sort | tail -1)
+    #viimeks=$(find ${simulation}/ -type f -exec stat \{} --printf='%(%s)T\n' \; | sort -n -r | head -n 1)
+    viimeksInt=$(python -c "print(str($viimeks).split('.')[0])")
+    ika=$(( aika-viimeksInt ))
+    if [[ $ika -gt $timeParam ]];
+    then
+        
+        echo 'true'
+    else
+        echo 'false'
+    fi
+
+}
+
 function jatkokasittelesimulaatio {
 
     simulation=$1
@@ -208,10 +232,6 @@ function jatkokasittelesimulaatio {
         folderROOT=$outputroot
     fi
     
-    echo " "
-    echo " "
-    
-    
     
     status=$( tarkistastatus $simulation $outputname $folderROOT)
     LS=${status:0:1}
@@ -222,44 +242,39 @@ function jatkokasittelesimulaatio {
 #         echo "case_isdac_LVL5_3D_ice1_v5.2_RadiationOn_aero1.5 ei tätä" $status
 #         exit 0
 #     fi
-
-    if [[ $status == '20' ]]
-    then
-        
-#         aika=$(date +%s)
-#             
-#         viimeks=$(find ${simulation}/ -printf "%T@\n" | sort | tail -1)
-#         #viimeks=$(find ${simulation}/ -type f -exec stat \{} --printf='%(%s)T\n' \; | sort -n -r | head -n 1)
-#         viimeksInt=$(python -c "print(str($viimeks).split('.')[0])")
-#         ika=$(( aika-viimeksInt ))
-#         if [[ $ika -gt 1200 ]];
-#         then
-#             
-#             echo $simulation "ongelmia"
-#             override=true poistaturhat $simulation $outputname $folderROOT
-#             sed -i "/walltime\s\{0,\}=\s\{0,\}/c\#PBS -l walltime=48:00:00" ${folderROOT}/${simulation}/runles.sh
-#             qsub ${folderROOT}/${simulation}/runles.sh
-#         fi
-        
-        
-        echo 'Status' $status 'simulaatio' $simulation  'on kesken' 
-        sed -i "/runtype\s\{0,\}=\s\{0,\}/c\  runtype  = '"HISTORY"'"  ${folderROOT}/${simulation}/NAMELIST
-        echo 'Re-submittoidaan' $simulation
-        #qsub ${folderROOT}/${simulation}/runles.sh
-    elif [[ $status == '13' ]]
-    then
-        echo 'Status' $status 'simulaatio' $simulation  'on valmis, postprosessointi puuttuu'
-        #rm -rf ${folderROOT}/${simulation}/${outputname}.nc ${folderROOT}/${simulation}/${outputname}.ts.nc  ${folderROOT}/${simulation}/${outputname}.ps.nc
-        #postprosessoi $simulation $outputname $jobnamepostfix
-    elif [[ $status == '11' ]]
-    then
-        echo 'Simulaatio' $simulation  'valmis'
-        poistaturhat $simulation $outputname $folderROOT
-        rsync -avz ${folderROOT}/${simulation}/ /ibrix/arch/ClimRes/aholaj/ISDAC/${simulation}/
+    vanha=$( viimeksimuutettu $simulation $outputname $folderROOT)
     
-    elif [[ $status == '00' ]]
-    then 
-        echo 'Simulaatio' $simulation  'alkutilassa'
+    if [[ $vanha == "true" ]]
+    then
+    
+        if [[ $status == '20' ]]
+        then
+            
+            echo 'Status' $status 'simulaatio' $simulation  'on kesken, RESUBMIT'
+            sed -i "/runtype\s\{0,\}=\s\{0,\}/c\  runtype  = '"HISTORY"'"  ${folderROOT}/${simulation}/NAMELIST
+            qsub ${folderROOT}/${simulation}/runles.sh
+            
+        elif [[ $status == '13' ]]
+        then
+        
+            echo 'Status' $status 'simulaatio' $simulation  'on valmis, postprosessointi puuttuu'
+            postprosessoi $simulation $outputname $jobnamepostfix
+            
+        elif [[ $status == '11' ]]
+        then
+            
+            echo 'Simulaatio' $simulation  'valmis'
+            poistaturhat $simulation $outputname $folderROOT
+            rsync -avz ${folderROOT}/${simulation}/ /ibrix/arch/ClimRes/aholaj/ISDAC/${simulation}/
+            #rm -rf ${folderROOT}/${simulation}/
+            
+        
+        elif [[ $status == '00' ]]
+        then 
+            echo 'Simulaatio' $simulation  'alkutilassa'
+        fi
+    else
+        echo "Simulaatio ei ole tarpeeksi vanha"
     fi
     
 
