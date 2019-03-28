@@ -1,7 +1,12 @@
 #!/bin/bash
 
 ####### DO NOT USE dim1 simultaneously with dim2 & dim3
+###
+### example for interactive ice simulation:
+# testinumero=v5.2.1_interactive_uus interactive=true nspec=2 listspec="'SO4','DU','','','','',''" volDistA='0.99,0.,0.,0.,0.,0.,0.' volDistB='0.01,1.,0.,0.,0.,0.,0.' nf2a=0.999 isoT=28800. pikkuT=120. nudge_time=0. frqhis=180000. iradtyp=3 case_name="'default'" jaakkoNL=false th00=263. sound_in=sound_in3.5 LVL=5 submit=true  exe=les.mpi.Jaakko.JJAv5.2.1.intel.fast dim2=true ./testiajot.bash
+##
 
+###
 # Exit on error
 set -e
 
@@ -55,6 +60,8 @@ ice=${ice:-1.0} # ice #/L
 sound_in=${sound_in:-sound_in}
 
 ########### version
+pwd0=${PWD}
+cd ${LES}
 command -v git 2>&1 >/dev/null
 if [ $? -eq 0 ]; then
     ver=`git describe --tags 2>&1`
@@ -65,6 +72,7 @@ if [ $? -eq 0 ]; then
 else
     ver=latest
 fi
+cd ${pwd0}
 ########### end version
 
 if [[ -n $hfilebase ]]; then
@@ -80,6 +88,18 @@ else
     jaakkoNL=''
 fi
 
+interactive=${interactive:-false}
+
+if [[ $interactive == 'true' ]]; then
+    interactive=''
+    interactiveNOT='!'
+    
+else
+    interactive='!'
+    interactiveNOT=''
+fi
+
+echo "interactive" $interactive "interactiveNOT" $interactiveNOT
 function copy {
 	
 	inputsubfolder=$1
@@ -136,7 +156,7 @@ function submitting {
 	
 	## submit
 	
-    input=${bin}/${inputsubfolder} exe=${exe} modifyoutput='true' modifyoutputHistory=${modifyoutputHistory} COPY=${copyOUT} clean=${copyOUT} WT=${WT} ownjobname=$ownjobnameSUB ${SCRIPT}/submit_uclales-salsa.bash $nimi $nproc $jobflag
+    submit=${qsub} input=${bin}/${inputsubfolder} exe=${exe} modifyoutput='true' modifyoutputHistory=${modifyoutputHistory} COPY=${copyOUT} clean=${copyOUT} WT=${WT} ownjobname=$ownjobnameSUB ${SCRIPT}/submit_uclales-salsa.bash $nimi $nproc $jobflag
 	
 	sleep 3s
     qstat -u $USER
@@ -184,7 +204,7 @@ function main {
     if [[ $copyOUT == 'false' ]] && [[ ${submit} == 'true' ]]; then
         copy $inputsubfolder $nimi $exe
         
-        ver=${ver} dir=${outputroot}/${nimi} nxp=${nxp} nyp=${nyp} nzp=${nzp} deltax=${deltax} deltay=${deltay} deltaz=${deltaz} nxpart=${nxpart} dzmax=${dzmax} dzrat=${dzrat} dtlong=${dtlong} distim=${distim} timmax=${timmax} Tspinup=${Tspinup} minispinup01=${minispinup01} minispinup02=${minispinup02} minispinupCase01=${minispinupCase01} minispinupCase02=${minispinupCase02} runtype=${runtype} level=${level} CCN=${CCN} prndtl=${prndtl} filprf=${filprf} hfilin=${hfilin} ssam_intvl=${ssam_intvl} savg_intvl=${savg_intvl} mcflg=${mcflg} frqhis=${frqhis} istpfl=${istpfl} lbinanl=${lbinanl} frqanl=${frqanl} corflg=${corflg} ipsflg=${ipsflg} itsflg=${itsflg} strtim=${strtim} sed_aero=${sed_aero} sed_cloud=${sed_cloud} sed_precp=${sed_precp} sed_ice=${sed_ice} sed_snow=${sed_snow} iradtyp=${iradtyp} case_name=${case_name} div=${div} sfc_albedo=${sfc_albedo} radsounding=${radsounding} cntlat=${cntlat} strtim=${strtim} isfctyp=${isfctyp} sst=${sst} dthcon=${dthcon} drtcon=${drtcon} ubmin=${ubmin} zrough=${zrough} th00=${th00} umean=${umean} vmean=${vmean} nlcoag=${nlcoag} nlcgcc=${nlcgcc} nlcgpp=${nlcgpp} nlcgaa=${nlcgaa} nlcgii=${nlcgii} nlcgss=${nlcgss} nlcgpc=${nlcgpc} nlcgca=${nlcgca} nlcgpa=${nlcgpa} nlcgia=${nlcgia} nlcgic=${nlcgic} nlcgip=${nlcgip} nlcgsa=${nlcgsa} nlcgsc=${nlcgsc} nlcgsi=${nlcgsi} nlcgsp=${nlcgsp} nlcnd=${nlcnd} nlcndgas=${nlcndgas} nlcndh2oae=${nlcndh2oae} nlcndh2ocl=${nlcndh2ocl} nlcndh2oic=${nlcndh2oic} nlauto=${nlauto} nlautosnow=${nlautosnow} nlactiv=${nlactiv} nlactbase=${nlactbase} nlactintst=${nlactintst} nlichom=${nlichom} nlichet=${nlichet} nlicimmers=${nlicimmers} nlicmelt=${nlicmelt} nlicbasic=${nlicbasic} nlfixinc=${nlfixinc} fixINC=${fixINC} rhlim=${rhlim} isdtyp=${isdtyp0} nspec=${nspec1} listspec=${listspec} volDistA=${volDistA} volDistB=${volDistB} nf2a=${nf2a} sigmag=${sigmag} dpg=${dpg} n=${n} jaakkoNL=${jaakkoNL} ${SCRIPT}/generate_namelist_ISDAC.bash
+        interactive=${interactive} interactiveNOT=${interactiveNOT} ice_dep=${ice_dep} ice_imm=${ice_imm} ice_hom=${ice_hom} ver=${ver} dir=${outputroot}/${nimi} nxp=${nxp} nyp=${nyp} nzp=${nzp} deltax=${deltax} deltay=${deltay} deltaz=${deltaz} nxpart=${nxpart} dzmax=${dzmax} dzrat=${dzrat} dtlong=${dtlong} distim=${distim} timmax=${timmax} Tspinup=${Tspinup} minispinup01=${minispinup01} minispinup02=${minispinup02} minispinupCase01=${minispinupCase01} minispinupCase02=${minispinupCase02} runtype=${runtype} level=${level} CCN=${CCN} prndtl=${prndtl} filprf=${filprf} hfilin=${hfilin} ssam_intvl=${ssam_intvl} savg_intvl=${savg_intvl} mcflg=${mcflg} frqhis=${frqhis} istpfl=${istpfl} lbinanl=${lbinanl} frqanl=${frqanl} corflg=${corflg} ipsflg=${ipsflg} itsflg=${itsflg} strtim=${strtim} sed_aero=${sed_aero} sed_cloud=${sed_cloud} sed_precp=${sed_precp} sed_ice=${sed_ice} sed_snow=${sed_snow} iradtyp=${iradtyp} case_name=${case_name} div=${div} sfc_albedo=${sfc_albedo} radsounding=${radsounding} cntlat=${cntlat} strtim=${strtim} isfctyp=${isfctyp} sst=${sst} dthcon=${dthcon} drtcon=${drtcon} ubmin=${ubmin} zrough=${zrough} th00=${th00} umean=${umean} vmean=${vmean} nlcoag=${nlcoag} nlcgcc=${nlcgcc} nlcgpp=${nlcgpp} nlcgaa=${nlcgaa} nlcgii=${nlcgii} nlcgss=${nlcgss} nlcgpc=${nlcgpc} nlcgca=${nlcgca} nlcgpa=${nlcgpa} nlcgia=${nlcgia} nlcgic=${nlcgic} nlcgip=${nlcgip} nlcgsa=${nlcgsa} nlcgsc=${nlcgsc} nlcgsi=${nlcgsi} nlcgsp=${nlcgsp} nlcnd=${nlcnd} nlcndgas=${nlcndgas} nlcndh2oae=${nlcndh2oae} nlcndh2ocl=${nlcndh2ocl} nlcndh2oic=${nlcndh2oic} nlauto=${nlauto} nlautosnow=${nlautosnow} nlactiv=${nlactiv} nlactbase=${nlactbase} nlactintst=${nlactintst} nlichom=${nlichom} nlichet=${nlichet} nlicimmers=${nlicimmers} nlicmelt=${nlicmelt} nlicbasic=${nlicbasic} nlfixinc=${nlfixinc} fixINC=${fixINC} rhlim=${rhlim} isdtyp=${isdtyp0} nspec=${nspec} listspec=${listspec} volDistA=${volDistA} volDistB=${volDistB} nf2a=${nf2a} sigmag=${sigmag} dpg=${dpg} n=${n} jaakkoNL=${jaakkoNL} ${SCRIPT}/generate_namelist_ISDAC.bash
         
     fi
     

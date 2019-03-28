@@ -1,0 +1,11 @@
+# Don't follow compiled files
+
+*.o
+*.mod
+*.pyc
+*.zip
+
+############################
+# Jaakko's auxialiry files #
+############################
+

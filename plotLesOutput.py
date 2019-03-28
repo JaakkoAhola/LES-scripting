@@ -3157,6 +3157,8 @@ if ICE:
         piirra_domainMeanProfiili( 'S_Rwiba', nimi = 'Ice particle mass mean diameter averaged testi', muunnosKerroin=2.e6  ,   ajanhetket = [6,8], useDN = False, binidata = True, xAxisL = r'[${\mu}m$]', color = icevari, savePrefix = 'domainMassMeanProfiili_salsa', askChangeOfVariable = askChangeOfVariable )
         
     if int(lvl) == -8: # Ovchinnikov style isdac plots
+        
+        domainP = False
 
         WPticks =  list(map(int, np.arange(0,60.1,2)))
         WPlabels = list(map(str, WPticks))
@@ -3200,7 +3202,8 @@ if ICE:
         
         cbvalICE    =  np.arange(0, 0.8, 0.1)
         cbvalICEStr = ['%.1f' % elem for elem in cbvalICE ]
-        piirra_domainProfiili( 'w_2', longName = "vertical velocity squared " + r'$m^{2}/s^{2}$', useDN = False, transpose = True, colorBarTickValues = cbvalICE, colorBarTickNames = cbvalICEStr, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = plt.cm.RdPu, profiili = True, spinup = spinup )
+        if domainP:
+            piirra_domainProfiili( 'w_2', longName = "vertical velocity squared " + r'$m^{2}/s^{2}$', useDN = False, transpose = True, colorBarTickValues = cbvalICE, colorBarTickNames = cbvalICEStr, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = plt.cm.RdPu, profiili = True, spinup = spinup )
         
         mdp.plot_suljetus(naytaPlotit)
         

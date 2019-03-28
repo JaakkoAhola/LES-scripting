@@ -163,6 +163,9 @@ def write_namelist( argv, filu="NAMELIST"):
     volDistA = "1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0"
     volDistB = "0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0"
     nf2a = "1.0"
+    
+    rainbinlim = "skip" #"20.0,25.2,31.7,40.0,50.3,63.5,80.0,100.,127.,160.,201.,254.,320.,403.,508.,640.,806.,1001.,1280.,1612.,2000."
+    ira_stat = "skip" # "7"
 
     sigmag = "1.59, 1.59, 2.0, 2.0, 2.0, 2.0, 2.0"  #! Stdev for initial aerosol size distribution
     dpg    = " 0.0209, 0.2, 0.9626, 0.2, 0.2, 0.2, 0.2"     #! Mode mean diameters in micrometers
@@ -173,6 +176,7 @@ def write_namelist( argv, filu="NAMELIST"):
        opts, args = getopt.getopt(argv,"h:",[ \
                                              "Tspinup=",\
                                              "erikoiskeissi=",\
+                                             "ver=",\
                                              "design=",\
                                              "case=",\
                                              "q_inv=",\
@@ -285,6 +289,8 @@ def write_namelist( argv, filu="NAMELIST"):
                                              "volDistA=",\
                                              "volDistB=",\
                                              "nf2a=",\
+                                             "rainbinlim=",\
+                                             "ira_stat=",\
                                              "sigmag=",\
                                              "dpg=",\
                                              "nconc=",\
@@ -337,6 +343,8 @@ def write_namelist( argv, filu="NAMELIST"):
             lsfreeRH_delay = Tspinup
         elif opt in ("--erikoiskeissi"):
             erikoiskeissi = arg
+        elif opt in ("--ver"):
+            ver = arg
         elif opt in ("--design"):
             design = arg
         elif opt in ("--case"):
@@ -559,6 +567,10 @@ def write_namelist( argv, filu="NAMELIST"):
             volDistB = arg
         elif opt in ("--nf2a"):
             nf2a = arg
+        elif opt in ("--rainbinlim"):
+            rainbinlim = arg            
+        elif opt in ("--ira_stat"):
+            ira_stat = arg            
         elif opt in ("--sigmag"):            
             sigmag = arg
         elif opt in ("--dpg"):
@@ -756,6 +768,8 @@ def write_namelist( argv, filu="NAMELIST"):
     lines.append( "  {0} = {1}  {2}".format("volDistA", volDistA,""))
     lines.append( "  {0} = {1}  {2}".format("volDistB", volDistB,""))
     lines.append( "  {0} = {1}  {2}".format("nf2a", nf2a, ""))
+    if skip(rainbinlim): lines.append( "  {0} = {1}  {2}".format("rainbinlim(1:21)", rainbinlim, ""))
+    if skip(ira_stat):   lines.append( "  {0} = {1}  {2}".format("ira_stat", ira_stat, ""))
     lines.append("")
     
     lines.append( "  {0} = {1}  {2}".format("sigmag".ljust(7), sigmag, "! Stdev for initial aerosol size distribution for isdtyp == 0 (uniform)  "))

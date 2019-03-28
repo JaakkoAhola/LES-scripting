@@ -37,18 +37,26 @@ fi
 designfilu=${designV:0:6}
 curdir=${PWD}
 
-cd ${IBRIX}/DESIGN
-tag=$(git describe --tags | tr -dc '[:alnum:].')
-
-if [[  ${tag} == ${designfilu} ]]; then
-    echo "You are using proper git branch"
+if [ -z "$B" ] && [ -z "$list" ]; then # generate list of cases automatically
+    automatic="true"
+    
+    echo "generate list of cases automatically"
 else
-    echo "Checkout to the same git branch as the training set should be"
-    exit 1
+    automatic="false"
 fi
 
-if [[ -z $B ]]
-then
+
+if [[ $automatic == "true" ]]; then
+    cd ${IBRIX}/DESIGN
+    tag=$(git describe --tags | tr -dc '[:alnum:].')
+
+    if [[  ${tag} == ${designfilu} ]]; then
+        echo "You are using proper git branch"
+    else
+        echo "Checkout to the same git branch as the training set should be"
+        exit 1
+    fi
+    
     source activate py36
     
     DESIGNnetcdffile=${IBRIX}/DESIGNnetcdf/${designfilu}/design_${designfilu}.nc
@@ -178,8 +186,13 @@ cp ${SCRIPT}/ECLAIR_calcs.py             ${emulatoroutputroot}/
 cp ${SCRIPT}/FindCloudBase.py            ${emulatoroutputroot}/
 
 cp ${SCRIPT}/${scriptname}               ${emulatoroutputroot}/
-cp $DESIGNnetcdffile                     ${emulatoroutputroot}/
+
 cp ${IBRIX}/DESIGN/design.csv            ${emulatoroutputroot}/
+
+if [[ $automatic == "true" ]]; then
+    cp $DESIGNnetcdffile                     ${emulatoroutputroot}/
+fi
+
 
 statusValmiit=0
 statusVainLESValmis=0

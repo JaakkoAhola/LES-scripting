@@ -16,6 +16,12 @@ nconc = np.asarray([155.24,    6.37])
 ice = range(1,5)
 aero = [0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
 muuttuja = 'iwp_bar'
+################
+##
+## print taulukon eka rivi
+## 
+#################
+
 #print(muuttuja.ljust(22) + " & ", end="")
 #for st in range(len(ice)):
 #    st1 = "ice " + str(ice[st])
@@ -26,7 +32,13 @@ muuttuja = 'iwp_bar'
 #print(" ")
 #print("-"*131)
 
-#
+
+################
+##
+## print ice-aero testiajot-komennot
+## 
+#################
+
 #yht = len(aero)*len(ice)
 #for aeroK in range(len(aero)) :
 #    k = 0

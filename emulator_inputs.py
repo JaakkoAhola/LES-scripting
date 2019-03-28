@@ -37,7 +37,7 @@ import sys
 import os
 import subprocess
 import glob
-import generate_namelist
+import generate_namelist_ECLAIR
 
 global mounted # if run on local computer
 global rootfolder
@@ -628,7 +628,7 @@ def write_namelist( input_vector ):
     
 
 
-    generate_namelist.write_namelist( argv, filu)
+    generate_namelist_ECLAIR.write_namelist( argv, filu)
     
     print('generated NAMELIST ' + str(case))
     print(' ')
@@ -830,7 +830,7 @@ if __name__ == "__main__":
             lista = None
         
         try:
-            if (int(sys.argv[7]) == 0 or int(sys.argv[8]) == 0) and (lista == None): # if runNroBegin or runNroEnd given as 0, generate the whole design automatically
+            if (int(sys.argv[7]) == 0 or int(sys.argv[8]) == 0) and (lista is None): # if runNroBegin or runNroEnd given as 0, generate the whole design automatically
                 runNroBegin = 1
                 designtiedosto = sys.argv[3]
                 runNroEnd = int(subprocess.check_output( "cat " + designtiedosto + " | wc -l ", shell=True).decode("utf-8"))-1
