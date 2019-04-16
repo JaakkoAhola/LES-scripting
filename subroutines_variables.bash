@@ -19,12 +19,12 @@ if [[ $jobflag == 'PBS' ]]; then
     export outputroot=/lustre/tmp/${USER}/${model}/
     export nodeNPU=28  # number of processing units in a node
     export submitCMD=qsub
-    export PATH="${LUSTRE}/anaconda2/bin:$PATH"
+    export PATH="${WRKDIR}/anaconda2/bin:$PATH"
     export WTMAX=24:00:00
 
 elif [[ $jobflag == 'SBATCH' ]]; then ## CSC's Sisu machine values
     export outputroot=/wrk/${USER}/${model}
-    export nodeNPU=24 # number of processing units in a node 
+    export nodeNPU=24 # number of processing units in a node
     export submitCMD=sbatch
     export WTMAX=72:00:00 #maximum value of wall time for small_long
     export outputPostfix=.out
@@ -37,7 +37,7 @@ export bin=${LES}/bin
 
 
 function odota {
-    
+
     outputname=$1
     aika=$2
     aika=${aika:-30s}
@@ -56,17 +56,17 @@ function odota {
 }
 
 function kopioibrixille {
-    
+
     echo ' '
     echo 'Kopioidaan ibrixille'
     simulation=$1
     outputname=$2
-    
+
     # if outputname doesn't exist set it to be same as simulation
     if [[ -z $outputname ]]; then
-        outputname=${simulation} 
+        outputname=${simulation}
     fi
-    
+
     mkdir -p ${ibrixrootfolder}/${outputname}/
     rsync -avz  ${outputroot}/${simulation}/ ${ibrixrootfolder}/${outputname}/ #--ignore-existing
     echo ' '
@@ -74,120 +74,131 @@ function kopioibrixille {
 }
 
 function kopioeclairille {
-    
+
     echo ' '
     echo 'Kopioidaan eclairille'
     simulation=$1
     outputname=$2
-    
+
     # if outputname doesn't exist set it to be same as simulation
     if [[ -z $outputname ]]; then
-        outputname=${simulation} 
+        outputname=${simulation}
     fi
-    
+
     mkdir -p ${eclairrootfolder}/${outputname}/
     rsync -avz  $extra ${outputroot}/${simulation}/ ${eclairrootfolder}/${outputname}/ #--ignore-existing
     echo ' '
 
 }
 
+function copyToFolder {
+    for item in ${list[@]}
+    do
+        echo $item
+        cp ${originfolder}/${item} ${destfolder}/
+    done
+}
+
 function postprosessoi {
-    
+
     echo ' '
     simulation=$1
     outputname=$2
     jobnamepostfix=$3
-    
+
     ncsub=${ncsub:-true}
     pssub=${pssub:-true}
     tssub=${tssub:-true}
-    
-    
+
+
     # if outputname doesn't exist set it to be same as simulation
     if [[ -z $outputname ]]; then
-        outputname=${simulation} 
+        outputname=${simulation}
     fi
-    
+
     # if scriptfolder doesn't exist set it to be the default
     if [[ -z $scriptfolder ]]; then
         scriptfolder=${SCRIPT}
     fi
-    
+
     # if jobnamepostfix doesn't exist set it to be the default
     if [[ -z $jobnamepostfix ]]; then
         jobnamepostfix=${outputname}
     fi
-    
+
     if [[ $ncsub == "true" ]]; then
         echo ' '
         echo 'Nyt postprosessoidaan nc'
-        ${scriptfolder}/submit_postpros.bash ${outputroot}/${simulation}/${outputname}    $scriptname $jobflag $jobnamepostfix
+        # WT as walltime e.g. 01:00:00 hours
+        WT=$WT ${scriptfolder}/submit_postpros.bash ${outputroot}/${simulation}/${outputname}    $scriptname $jobflag $jobnamepostfix
     fi
-    
+
     if [[ $pssub == "true" ]]; then
         echo ' '
         echo 'Nyt postprosessoidaan ps'
-        ${scriptfolder}/submit_postpros.bash ${outputroot}/${simulation}/${outputname}.ps $scriptname $jobflag $jobnamepostfix
+        # WT as walltime e.g. 01:00:00 hours
+        WT=$WT ${scriptfolder}/submit_postpros.bash ${outputroot}/${simulation}/${outputname}.ps $scriptname $jobflag $jobnamepostfix
     fi
-    
-    if [[ $tssub == "true" ]]; then    
+
+    if [[ $tssub == "true" ]]; then
         echo ' '
         echo 'Nyt postprosessoidaan ts'
-        ${scriptfolder}/submit_postpros.bash ${outputroot}/${simulation}/${outputname}.ts $scriptname $jobflag $jobnamepostfix
+        # WT as walltime e.g. 01:00:00 hours
+        WT=$WT ${scriptfolder}/submit_postpros.bash ${outputroot}/${simulation}/${outputname}.ts $scriptname $jobflag $jobnamepostfix
     fi
-    
+
     echo ' '
     echo 'Submittoitu postprosessointiin'
 
 }
 
 function postprosessoiinteractive {
-    
+
     echo ' '
     simulation=$1
     outputname=$2
     folderROOT=$3
 
-    
+
     ncsub=${ncsub:-true}
     pssub=${pssub:-true}
     tssub=${tssub:-true}
-    
-    
+
+
     # if outputname doesn't exist set it to be same as simulation
     if [[ -z $outputname ]]; then
-        outputname=${simulation} 
+        outputname=${simulation}
     fi
-    
+
     # if scriptfolder doesn't exist set it to be the default
     if [[ -z $scriptfolder ]]; then
         scriptfolder=${SCRIPT}
     fi
 
-    
+
     if [[ -z $folderROOT ]]; then
         folderROOT=$outputroot
     fi
 
-    
+
     if [[ $ncsub == "true" ]]; then
         echo ' '
         echo 'Nyt postprosessoidaan nc'
         python ${scriptfolder}/${scriptname} ${folderROOT}/${simulation}/${outputname}
     fi
-    
+
     if [[ $pssub == "true" ]]; then
         echo ' '
         echo 'Nyt postprosessoidaan ps'
         python ${scriptfolder}/${scriptname} ${folderROOT}/${simulation}/${outputname}.ps
     fi
-    
-    if [[ $tssub == "true" ]]; then    
+
+    if [[ $tssub == "true" ]]; then
         echo ' '
         echo 'Nyt postprosessoidaan ts'
         python ${scriptfolder}/${scriptname} ${folderROOT}/${simulation}/${outputname}.ts
     fi
-    
+
     echo ' '
     echo 'Postprosessoitu'
 
@@ -198,18 +209,18 @@ function viimeksimuutettu {
     simulation=$1
     outputname=$2
     folderROOT=$3
-    
+
     timeParam=${timeParam:-3600}
-    
+
     aika=$(date +%s)
-        
+
     viimeks=$(find ${simulation}/ -printf "%T@\n" | sort | tail -1)
     #viimeks=$(find ${simulation}/ -type f -exec stat \{} --printf='%(%s)T\n' \; | sort -n -r | head -n 1)
     viimeksInt=$(python -c "print(str($viimeks).split('.')[0])")
     ika=$(( aika-viimeksInt ))
     if [[ $ika -gt $timeParam ]];
     then
-        
+
         echo 'true'
     else
         echo 'false'
@@ -227,80 +238,80 @@ function jatkokasittelesimulaatio {
     if [[ -z $outputname ]]; then
         outputname=${simulation}
     fi
-    
+
     if [[ -z $folderROOT ]]; then
         folderROOT=$outputroot
     fi
-    
-    
+
+
     status=$( tarkistastatus $simulation $outputname $folderROOT)
     LS=${status:0:1}
     PPS=${status:1:2}
-    
+
 #     if [[ $simulation == "case_isdac_LVL5_3D_ice1_v5.2_RadiationOn_aero1.5" ]]
 #     then
 #         echo "case_isdac_LVL5_3D_ice1_v5.2_RadiationOn_aero1.5 ei tätä" $status
 #         exit 0
 #     fi
     vanha=$( viimeksimuutettu $simulation $outputname $folderROOT)
-    
+
     if [[ $vanha == "true" ]]
     then
-    
+
         if [[ $status == '20' ]]
         then
-            
+
             echo 'Status' $status 'simulaatio' $simulation  'on kesken, RESUBMIT'
             sed -i "/runtype\s\{0,\}=\s\{0,\}/c\  runtype  = '"HISTORY"'"  ${folderROOT}/${simulation}/NAMELIST
             qsub ${folderROOT}/${simulation}/runles.sh
-            
+
         elif [[ $status == '13' ]]
         then
-        
+
             echo 'Status' $status 'simulaatio' $simulation  'on valmis, postprosessointi puuttuu'
-            postprosessoi $simulation $outputname $jobnamepostfix
-            
+            WT=24:00:00 postprosessoi $simulation $outputname $jobnamepostfix
+
         elif [[ $status == '11' ]]
         then
-            
+
             echo 'Simulaatio' $simulation  'valmis'
             poistaturhat $simulation $outputname $folderROOT
             rsync -avz ${folderROOT}/${simulation}/ /ibrix/arch/ClimRes/aholaj/ISDAC/${simulation}/
             #rm -rf ${folderROOT}/${simulation}/
-            
-        
+
+
         elif [[ $status == '00' ]]
-        then 
+        then
             echo 'Simulaatio' $simulation  'alkutilassa'
         fi
     else
         echo "Simulaatio ei ole tarpeeksi vanha"
     fi
-    
+
 
 }
 
 function poistaturhat {
-    
+
 
     simulation=$1
     outputname=$2
     folderROOT=$3
-    
+
     override=${override:-false}
-    
+
 
 
     if [[ -z $outputname ]]; then
         outputname=${simulation}
     fi
-    
+
     if [[ -z $folderROOT ]]; then
         folderROOT=$outputroot
     fi
-    
+
     echo 'Tarkastellaan statusta, kansio :' ${simulation}
-    
+
     status=$( tarkistastatus $simulation $outputname $folderROOT)
     LS=${status:0:1}
     PPS=${status:1:2}
@@ -309,12 +320,12 @@ function poistaturhat {
     then
         echo 'Simulaatio' $simulation  'on valmis poistetaan turhat'
     fi
-    
+
     if [[ $override == 'true' ]]
     then
         echo 'poistetaan turhat, koska override'
     fi
-    
+
     if [ $status == '11'  ] || [ $override == 'true' ]; then
         echo 'DELETING'
 #       rm -rf ${folderROOT}/${simulation}/datafiles
@@ -351,11 +362,11 @@ function tarkistastatus {
     simulation=$1
     outputname=$2
     folderROOT=$3
-    
+
     if [[ -z $outputname ]]; then
         outputname=${simulation}
     fi
-    
+
     if [[ -z $folderROOT ]]; then
         folderROOT=${outputroot}
     fi
@@ -374,9 +385,9 @@ function tarkistastatus {
             last=$apulast
         fi
     done
-    
+
     if [[ $last -ge $((timmax-1)) ]]; then
-        for f in ${folderROOT}/${simulation}/*.nc; do 
+        for f in ${folderROOT}/${simulation}/*.nc; do
             [ -e "$f" ] && les=1 || les=0
             break
         done
@@ -386,7 +397,7 @@ function tarkistastatus {
             break
         done
     fi
-    
+
     #touch ${folderROOT}/${simulation}/debug${outputname}.log #debugkebab
     #echo $simulation $outputname 'ollaan tarkistastatuksessa LESSIN STATUKSEN tarkastelun jalkeen LES status' $les >> ${folderROOT}/${simulation}/debug${outputname}.log   #debugkebab
     ############################
@@ -394,7 +405,7 @@ function tarkistastatus {
     ############################
     if [[ $les == 1 ]]; then
         if [ -f ${folderROOT}/${simulation}/${outputname}.nc ] && [ -f ${folderROOT}/${simulation}/${outputname}.ts.nc ] && [ -f ${folderROOT}/${simulation}/${outputname}.ps.nc ]; then
-            #lasttimeNC=$( ncdump -v time -f fortran ${folderROOT}/${simulation}/${outputname}.nc    | tail -2 | head -1 | cut -f 1 --delimiter=/ |tr -dc '[:alnum:].' | cut -f 1 --delimiter=. ) 
+            #lasttimeNC=$( ncdump -v time -f fortran ${folderROOT}/${simulation}/${outputname}.nc    | tail -2 | head -1 | cut -f 1 --delimiter=/ |tr -dc '[:alnum:].' | cut -f 1 --delimiter=. )
 	    lasttimeNC=$timmax
             lasttimePS=$( ncdump -v time -f fortran ${folderROOT}/${simulation}/${outputname}.ps.nc | tail -2 | head -1 | cut -f 1 --delimiter=/ | tr -dc '[:alnum:].' | cut -f 1 --delimiter=. )
             lasttimeTS=$( ncdump -v time -f fortran ${folderROOT}/${simulation}/${outputname}.ts.nc | tail -2 | head -1 | cut -f 1 --delimiter=/ | tr -dc '[:alnum:].' | cut -f 1 --delimiter=. )
@@ -413,7 +424,7 @@ function tarkistastatus {
         else
             for f in ${folderROOT}/${simulation}/${outputname}*.0*0*.nc; do # jos postprosessoituja filuja ei ole,  mutta prossufiluja on, postprosessoidaan uusiks; jos mitään ei ole kaikki menee urhomatti
                 if [ -e "$f" ]; then
-                    postpros=3 #les is ready and pospros is ready to be postprocessed 
+                    postpros=3 #les is ready and pospros is ready to be postprocessed
                 else
                     postpros=0
                     les=0
@@ -424,9 +435,8 @@ function tarkistastatus {
     else
         postpros=0
     fi
-    
+
     #echo 'ollaan tarkistastatuksessa POSTPROS STATUKSEN tarkastelun jalkeen LES status' $les 'postpros status' $postpros  >> ${folderROOT}/${simulation}/debug${outputname}.log #debugkebab
     echo ${les}${postpros}
-    
-}    
 
+}

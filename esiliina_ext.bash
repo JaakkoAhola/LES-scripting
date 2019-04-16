@@ -12,10 +12,10 @@ else
 fi
 source ${scriptref}/subroutines_variables.bash
 
-
+loopFolders=${loopFolders:-case_isdac}
 function looppaatarkastapoista {
 
-    for i in $(ls -d  case_isdac* )
+    for i in $(ls -d  ${loopFolders}* )
     do
         
         echo $i
