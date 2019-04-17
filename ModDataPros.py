@@ -842,7 +842,7 @@ def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, current
   if markers and not scatter:
       plt.plot( x, y, color = currentColor, label=label, linestyle=linestyle, marker=marker, markersize = markersize )
   elif not markers and not scatter:
-      plt.plot( x, y, color = currentColor, label=label) # default
+      plt.plot( x, y, color = currentColor, label=label, linestyle=linestyle) # default
   elif scatter:
       plt.scatter( x, y, color = currentColor, label=label, s=markersize**2, marker = marker)
 
@@ -884,11 +884,14 @@ def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
         cmap(np.linspace(minval, maxval, n)))
     return new_cmap
 
-def scientific_colormaps(cmap_name, scm_base_dir = os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/"):
+def scientific_colormaps(cmap_name, scm_base_dir = os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/", reverse = False):
 
     cmap_file = scm_base_dir+cmap_name+'/'+cmap_name+'.txt'
 
     cmap_data = np.loadtxt(cmap_file)
+
+    if reverse:
+        cmap_data = np.flip(cmap_data)
 
     return colors.LinearSegmentedColormap.from_list(cmap_name, cmap_data)
 

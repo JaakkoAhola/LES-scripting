@@ -26,10 +26,10 @@ volDistB        = '0.01,1.,0.,0.,0.,0.,0.',\
 nf2a            = "0.999",\
 isoT            = "28800.",\
 pikkuT          = "120.",\
-nudge_time      = "0.",\
+nudge_time      = "28800.",\
 frqhis          = "180000.",\
-iradtyp         = "3",\
-case_name       = '"default"',\
+iradtyp         = "5",\
+case_name       = "'isdac'",\
 jaakkoNL        = "false",\
 th00            = "263.",\
 sound_in        = "sound_in3.5",\
@@ -157,7 +157,7 @@ def interactive_aero_testi( testinumeroetuliite, aero, nconc, nf2aList, volList,
                     testinumero = testinumeroetuliite + "DU_" +duConc +"g"   # "nf2a" + nf2a + + str(aero[aeroK]) +"volA" + str(round(volaA,2))+
                     if aja:
                         #ajakomento(qsub="true", n = n, nf2a = nf2a, volDistA=volDistA, volDistB=volDistB, testinumero = testinumero, extra = extra, dim1 = "true", exe = "les.seq.Jaakko.JJAv5.2.1.intel.fast" )
-                        ajakomento(qsub="true", n = n, nf2a = nf2a, volDistA=volDistA, volDistB=volDistB, testinumero = testinumero, extra = extra, dim3 = "true", exe = "les.mpi.Jaakko.IceV1.0.mis" + mis + ".intel.fast", pikkuT = "7200.")
+                        ajakomento(qsub="false", n = n, nf2a = nf2a, volDistA=volDistA, volDistB=volDistB, testinumero = testinumero, extra = extra, dim2 = "true", exe = "les.mpi.Jaakko.IceV1.0.mis" + mis + ".intel.fast", pikkuT = "7200.")
                     if analysoi:
                         analysoiPrinttaaTaulukko(testinumero = testinumero)
 
@@ -192,7 +192,7 @@ print(volList)
 
 exeList = [0.7] #np.arange(0.1, 0.91, 0.1)
 print(exeList)
-testinumeroetuliite = ""
+testinumeroetuliite = "Set"
 nconc = np.asarray([155.24,    6.37])
 sumnconc = np.sum(nconc)
 dulist = np.concatenate( (np.asarray([1.]), np.arange(2.5, 10.1, 2.5)) )*1e-3
@@ -205,4 +205,4 @@ print(nf2aList)
 debug = False
 
 
-interactive_aero_testi( testinumeroetuliite, aero, nconc, nf2aList, volList, exeList=exeList, aja = True, extra = ["nlcoag=.TRUE."])
+interactive_aero_testi( testinumeroetuliite, aero, nconc, nf2aList, volList, exeList=exeList, aja = True, extra = ["nlcoag=.FALSE."])
