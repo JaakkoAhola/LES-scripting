@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 from itertools import cycle
 import matplotlib.patches as mpatches
 import matplotlib.colors as colors
-
+import seaborn as sns
 
 #################################
 ### subroutines               ###
@@ -628,9 +628,9 @@ def aikasarjaTulostus( data, aika = 0, tulostus = False, piirra = False, uusikuv
   #if uusikuva:
       #aikasarjaTulostus.fig, aikasarjaTulostus.ax = plot_alustus()
 
-  aikasarjaTulostus.fig, aikasarjaTulostus.ax = plottaa( aika, data, nimi, xnimi, ynimi, changeColor = changeColor, tightXAxis=tightXAxis, LEGEND=LEGEND, omavari = omavari, label = label, uusikuva = uusikuva )
+  aikasarjaTulostus.fig, aikasarjaTulostus.ax, aikasarjaTulostus.legend = plottaa( aika, data, nimi, xnimi, ynimi, changeColor = changeColor, tightXAxis=tightXAxis, LEGEND=LEGEND, omavari = omavari, label = label, uusikuva = uusikuva )
 
-  return aikasarjaTulostus.fig, aikasarjaTulostus.ax
+  return aikasarjaTulostus.fig, aikasarjaTulostus.ax, aikasarjaTulostus.legend
 
 ###########################################
 ### print/draw timeseries of a variable ###
@@ -673,24 +673,96 @@ def xstr(s):
         return ''
     return str(s)
 
+######################################
+###                                ###
+### give a list of distinct colors ###
+### number <= 22                   ###
+######################################
+def giveDistinctColorList(number, blindnesslevel = 4, useBlack = True, useWhite = False, useLavender = False, useBeige = False):
+
+    # list of all the colors
+    distinctColors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabebe", "#469990", "#e6beff", "#9A6324", "#fffac8", "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#ffffff", "#000000"]
+
+    # choose indexes of colors, based on blindnesslevel parameter (values 1,2,3,4 allowed, default 4)
+    if blindnesslevel == 1: # 95% of population can tell the difference
+        listOfIndexes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21] # 22 colors including black & white
+
+    elif blindnesslevel == 2: # 99% of population can tell the difference
+        listOfIndexes = [0, 1, 2, 3, 4, 6, 7, 9, 10, 11, 12, 13, 14, 15, 18, 19, 20, 21] # 18 colors including black & white
+
+    elif blindnesslevel == 3: # 99,99% of population can tell the difference
+        listOfIndexes = [2, 3, 4, 9, 11, 14, 18, 19, 20, 21] # 10 colors including black & white
+    elif blindnesslevel == 4:  # ~100% of population can tell the difference
+
+        listOfIndexes = [2, 3, 19, 20] # 4 colors including black & white
+    else:
+        return False
+
+    # if white is not needed, remove it from the listOfIndexes
+    # useWhite default set is False since usually colors are painted using white background
+    if not useWhite:
+        try:
+            listOfIndexes.remove(20)
+        except ValueError:
+            pass # value already removed
+
+    # if you don't want to use black color
+    if not useBlack:
+        try:
+            listOfIndexes.remove(21)
+        except ValueError:
+            pass # value already removed
+
+    # if you don't want to use lavender color
+    if not useLavender:
+        try:
+            listOfIndexes.remove(11)
+        except ValueError:
+            pass # value already removed
+
+    # if you don't want to use beige color
+    if not useBeige:
+        try:
+            listOfIndexes.remove(13)
+        except ValueError:
+            pass # value already removed
+
+    # if the number of colors needed is larger than within the blindnesslevel, use recursion and decrease blindnesslevel
+    if number > len(listOfIndexes) and (blindnesslevel > 1):
+        return giveDistinctColorList( number, blindnesslevel - 1, useBlack = useBlack, useWhite = useWhite )
+
+    # if the number of colors needed is larger than possible colors and blindnesslevel can't be decreased, return False value
+    elif number > len(listOfIndexes) and (blindnesslevel == 1):
+        return False # list of colors not possible to generate with the given number
+    else:
+        return [ distinctColors[i] for i in listOfIndexes[:number] ] # give list of distinctColors with given number, blindnesslevel and choice of using white & black
+
+
 ########################################
 ### colorPool object class           ###
 ###                                  ###
 ########################################
 class colorPool:
 
-    def __init__( self, colorNumber, colorList = None, shuffling = False ):
-        colorMap = plt.cm.gist_ncar
-        if colorNumber > 7 and colorList is None:
+    def __init__( self, colorNumber, colorList = None, shuffling = False, useSnsColor = False, blindnesslevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, snsColorPalette = "bright", colorMap = plt.cm.gist_ncar ):
 
-            colorList = [colorMap(i) for i in np.linspace(0, 0.95, colorNumber)]
+        nmax = 21
 
-            if shuffling:
-                np.random.shuffle(colorList)
+        if colorList is None:
+            if colorNumber > nmax:
+                if not useSnsColor:
+                    colorList = [ colorMap(i) for i in np.linspace(0, 0.95, colorNumber) ]
+                else:
+                    colorList = sns.color_palette( snsColorPalette, colorNumber )
 
-        elif colorNumber <= 21 and colorList is None :
-            colorList = ['#e6194b', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#46f0f0', '#f032e6', '#bcf60c', '#fabebe', '#008080', '#e6beff', '#9a6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#808080', '#000000'][:colorNumber]
+            else:
+                if not useSnsColor:
+                    colorList = giveDistinctColorList(colorNumber, blindnesslevel = blindnesslevel, useWhite = useWhite, useBlack = useBlack, useBeige = useBeige, useLavender = useLavender)
+                else:
+                    colorList = sns.color_palette( snsColorPalette, colorNumber )
 
+        if shuffling:
+            np.random.shuffle(colorList)
         self.currentColor = colorList[0]
         self.colors = cycle( colorList )
 
@@ -707,9 +779,11 @@ class colorPool:
 ### drawn                            ###
 ########################################
 
-def initializeColors(colorNRO=6, colorList = None, shuffling = False):
+def initializeColors(colorNRO=6, colorList = None, shuffling = False, useSnsColor = False, blindnesslevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, snsColorPalette = "bright", colorMap = plt.cm.gist_ncar):
+
   global colorChoice
-  colorChoice = colorPool( colorNumber = colorNRO, colorList = colorList, shuffling = shuffling)
+
+  colorChoice = colorPool( colorNumber = colorNRO, colorList = colorList, shuffling = shuffling, useSnsColor = useSnsColor, blindnesslevel = blindnesslevel, useWhite = useWhite, useBlack = useBlack, useBeige = useBeige, useLavender = useLavender, snsColorPalette = snsColorPalette, colorMap = colorMap)
 
   return colorChoice
 
@@ -846,11 +920,16 @@ def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, current
   elif scatter:
       plt.scatter( x, y, color = currentColor, label=label, s=markersize**2, marker = marker)
 
-  if LEGEND:
-      if loc == 2: # right side
-        plt.legend(bbox_to_anchor=(1.02, 1), loc=loc, borderaxespad=0., fancybox = True, shadow = True )
-      elif loc == 3: # top
-        plt.legend(bbox_to_anchor=(0., 1.06, 1., .102), loc=loc, ncol=6, fancybox = True, shadow = True , mode="expand" ) # upper center ,  prop={'size': 18}      bbox_to_anchor = ( 0., 1.1, 0.6, 20.102 ),loc=9,  ncol=2, mode="expand", borderaxespad=0., fancybox = True, shadow = True
+
+  if loc == 2: # right side
+      plottaa.legend = plt.legend(bbox_to_anchor=(1.02, 1), loc=loc, borderaxespad=0., fancybox = True, shadow = True )
+  elif loc == 3: # top
+      plottaa.legend = plt.legend(bbox_to_anchor=(0., 1.06, 1., .102), loc=loc, ncol=6, fancybox = True, shadow = True , mode="expand" ) # upper center ,  prop={'size': 18}      bbox_to_anchor = ( 0., 1.1, 0.6, 20.102 ),loc=9,  ncol=2, mode="expand", borderaxespad=0., fancybox = True, shadow = True
+  for legobj in plottaa.legend.legendHandles:
+      legobj.set_linewidth(8.0)
+
+  if not LEGEND:
+      plottaa.legend.remove()
 
   plt.xlabel( xl ) #r'$\#/m^3$'
   plt.ylabel( yl )
@@ -874,9 +953,16 @@ def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, current
     plt.xscale('log')
 
   try:
-      return plottaa.fig, plottaa.ax
+      return plottaa.fig, plottaa.ax, plottaa.legend
   except AttributeError:
       sys.exit("You probably forgot to give uusikuva argument as True at least once")
+
+def export_legend(legend, filename="legend.png"):
+    fig  = legend.figure
+    print("export legenda", legend, type(legend), filename, fig, type(fig))
+    fig.canvas.draw()
+    bbox  = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
+    fig.savefig(filename, dpi="figure", bbox_inches=bbox)
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = colors.LinearSegmentedColormap.from_list(
