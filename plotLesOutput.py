@@ -3345,7 +3345,7 @@ if ICE:
     if int(lvl) == -8: # Ovchinnikov style isdac plots
 
         domainP = True
-
+        RajausFlag = True
         try:
             if len(tag[-1]) > 0:
                 tagii = "_" + tag[-1]
@@ -3372,19 +3372,19 @@ if ICE:
             mdp.plot_suljetus(naytaPlotit)
 
 
-        piirra_aikasarjasettii( muuttuja = 'zc', muuttuja2 = 'zb',     longName= ' ', ylabel = 'height [m]', ymin = 0.0, extendBelowZero = False,  savePrefix = 'cloud_top_base' + tagii + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = korkeustikit, ylabels = ylabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel,  legenda = legendaPaper, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3) #piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3,
+        piirra_aikasarjasettii( muuttuja = 'zc', muuttuja2 = 'zb',     longName= ' ', ylabel = 'height [m]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cloud_top_base' + tagii + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = korkeustikit, ylabels = ylabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel,  legenda = legendaPaper, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3) #piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3,
 
         mdp.plot_suljetus(naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'Nc_ic', muunnosKerroin = 1.e-6, longName = 'in-cloud CDNC', ylabel = r'[$\#/10^{-6}kg$]', ymin = 0.0,  savePrefix = 'cdnc' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+        piirra_aikasarjasettii( muuttuja = 'Nc_ic', muunnosKerroin = 1.e-6, longName = 'in-cloud CDNC', ylabel = r'[$\#/10^{-6}kg$]', asetaRajat = RajausFlag, ymin = 0.0,  savePrefix = 'cdnc' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
 
         mdp.plot_suljetus(naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = 'Ice number concentration', ylabel = r'[$\#/10^{-3}kg$]', ymin = 0.0,  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = 'Ice number concentration', ylabel = r'[$\#/10^{-3}kg$]', asetaRajat = RajausFlag, ymin = 0.0,  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
 
         mdp.plot_suljetus(naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'wmax', longName = 'Maximum vertical velocity', ylabel = '[m/s]', ymin = 0.0, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True )
+        piirra_aikasarjasettii( muuttuja = 'wmax', longName = 'Maximum vertical velocity', ylabel = '[m/s]', asetaRajat = RajausFlag, ymin = 0.0, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True )
 
         mdp.plot_suljetus(naytaPlotit)
 
@@ -3397,7 +3397,7 @@ if ICE:
 
         WPticks = np.arange(0,6.1,1)
         WPlabels = list(map(str, WPticks))
-        piirra_aikasarjasettii( muuttuja = 'rmH2Oic',     muunnosKerroin = 1.e6,  longName = ' ', ylabel = r'[$10^{-6} kg m^{-2} s^{-1}$]', ymin = 0.0, ymax=WPticks[-1], extendBelowZero = False,  savePrefix = 'depIce', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 5, askChangeOfVariable = askChangeOfVariable, legenda = legendaPaper )
+        piirra_aikasarjasettii( muuttuja = 'rmH2Oic',     muunnosKerroin = 1.e6,  longName = ' ', ylabel = r'[$10^{-6} kg m^{-2} s^{-1}$]', asetaRajat = RajausFlag, ymin = 0.0, ymax=WPticks[-1], extendBelowZero = False,  savePrefix = 'depIce', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 5, askChangeOfVariable = askChangeOfVariable, legenda = legendaPaper )
 
         mdp.plot_suljetus(naytaPlotit)
 
@@ -3405,12 +3405,12 @@ if ICE:
         ["rmDUic", "Deposition of DU with ice", r'$kg m^{-2} s^{-1}$', 1.e12],
         ["rmDUcl", "Deposition of dust with of clouds", r'$kg m^{-2} s^{-1}$', 1.e6],
         ["DU_ii", "Dust mass mixing ratio in ice", "kg/kg", 1.e12], ["DU_ic", "Cloud droplet DU mass mixing ratio", "kg/kg", 1.e12], ["DU_int", "DU mass mixing ratio in interstitial aerosols", "kg/kg", 1.e12 ]]:
-            piirra_aikasarjasettii( muuttujaTemp, longName =nameTemp, ylabel = r'[$10^{' + str(-int(np.log10(muunnosTemp)))+'}$'+ unitTemp+ ']', muunnosKerroin = muunnosTemp, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+            piirra_aikasarjasettii( muuttujaTemp, longName =nameTemp, ylabel = r'[$10^{' + str(-int(np.log10(muunnosTemp)))+'}$'+ unitTemp+ ']', muunnosKerroin = muunnosTemp, asetaRajat = RajausFlag, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
 
             mdp.plot_suljetus(naytaPlotit)
 
         for muuttujaTemp, nameTemp, unitTemp in [["vtke","Vertical integral of total TKE", "kg/s" ]]:
-            piirra_aikasarjasettii( muuttujaTemp, longName =' ', ylabel = r'[$'+ unitTemp+ '$]', muunnosKerroin = 1., ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+            piirra_aikasarjasettii( muuttujaTemp, longName =' ', ylabel = r'[$'+ unitTemp+ '$]', muunnosKerroin = 1., asetaRajat = RajausFlag, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
 
             mdp.plot_suljetus(naytaPlotit)
 
