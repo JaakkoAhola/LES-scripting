@@ -255,8 +255,13 @@ if __name__ == "__main__":
     else:
         LEGEND = True
 
+    if colorNRO <= 18:
+        useSnsColor = False
+    else:
+        useSnsColor = True
+
     if not colorSetup:
-        colorChoice = mdp.initializeColors(colorNRO, useSnsColor = True)
+        colorChoice = mdp.initializeColors(colorNRO, useSnsColor = useSnsColor)
     elif colorSetup:
         colorList = []
         for simulaatioIND in range(len(tiedostolista)):

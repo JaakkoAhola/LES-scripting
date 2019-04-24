@@ -678,7 +678,7 @@ def xstr(s):
 ### give a list of distinct colors ###
 ### number <= 22                   ###
 ######################################
-def giveDistinctColorList(number, blindnesslevel = 4, useBlack = True, useWhite = False, useLavender = False, useBeige = False):
+def giveDistinctColorList(number, blindnesslevel = 4, useBlack = True, useWhite = False, useLavender = False, useBeige = False, useGray = False):
 
     # list of all the colors
     distinctColors = ["#e6194B", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#42d4f4", "#f032e6", "#bfef45", "#fabebe", "#469990", "#e6beff", "#9A6324", "#fffac8", "#800000", "#aaffc3", "#808000", "#ffd8b1", "#000075", "#a9a9a9", "#ffffff", "#000000"]
@@ -727,9 +727,16 @@ def giveDistinctColorList(number, blindnesslevel = 4, useBlack = True, useWhite 
         except ValueError:
             pass # value already removed
 
+    # if you don't want to use gray color
+    if not useGray:
+        try:
+            listOfIndexes.remove(19)
+        except ValueError:
+            pass # value already removed
+
     # if the number of colors needed is larger than within the blindnesslevel, use recursion and decrease blindnesslevel
     if number > len(listOfIndexes) and (blindnesslevel > 1):
-        return giveDistinctColorList( number, blindnesslevel - 1, useBlack = useBlack, useWhite = useWhite )
+        return giveDistinctColorList( number, blindnesslevel - 1, useBlack = useBlack, useWhite = useWhite, useLavender = useLavender, useBeige = useBeige, useGray = useGray )
 
     # if the number of colors needed is larger than possible colors and blindnesslevel can't be decreased, return False value
     elif number > len(listOfIndexes) and (blindnesslevel == 1):
@@ -744,7 +751,7 @@ def giveDistinctColorList(number, blindnesslevel = 4, useBlack = True, useWhite 
 ########################################
 class colorPool:
 
-    def __init__( self, colorNumber, colorList = None, shuffling = False, useSnsColor = False, blindnesslevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, snsColorPalette = "bright", colorMap = plt.cm.gist_ncar ):
+    def __init__( self, colorNumber, colorList = None, shuffling = False, useSnsColor = False, blindnesslevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, useGray = False, snsColorPalette = "bright", colorMap = plt.cm.gist_ncar ):
 
         nmax = 21
 
@@ -757,7 +764,7 @@ class colorPool:
 
             else:
                 if not useSnsColor:
-                    colorList = giveDistinctColorList(colorNumber, blindnesslevel = blindnesslevel, useWhite = useWhite, useBlack = useBlack, useBeige = useBeige, useLavender = useLavender)
+                    colorList = giveDistinctColorList(colorNumber, blindnesslevel = blindnesslevel, useWhite = useWhite, useBlack = useBlack, useBeige = useBeige, useLavender = useLavender, useGray = useGray)
                 else:
                     colorList = sns.color_palette( snsColorPalette, colorNumber )
 
@@ -959,7 +966,6 @@ def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, current
 
 def export_legend(legend, filename="legend.png"):
     fig  = legend.figure
-    print("export legenda", legend, type(legend), filename, fig, type(fig))
     fig.canvas.draw()
     bbox  = legend.get_window_extent().transformed(fig.dpi_scale_trans.inverted())
     fig.savefig(filename, dpi="figure", bbox_inches=bbox)
