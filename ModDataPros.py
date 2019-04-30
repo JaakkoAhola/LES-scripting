@@ -304,7 +304,7 @@ def laske_path_aikasarjaXYZ( mixRatData, dn0_data, korkeus, aika = None, muunnos
 
 
  #   if uusikuva:
-    return laske_path_aikasarjaXYZ.fig, laske_path_aikasarjaXYZ.ax
+    return laske_path_aikasarjaXYZ.fig, laske_path_aikasarjaXYZ.ax, aika, timeSeries
     #else:
         #return None, None
 

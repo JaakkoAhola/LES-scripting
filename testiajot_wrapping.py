@@ -144,7 +144,7 @@ def interactive_aero_testi( testinumeroetuliite, aero, nconc, nf2aList, volList,
         for frac in range(len(nf2aList)):
             for indVola in range(len(volList)):
                 for exe in range(len(exeList)):
-                    mis = str(round(exeList[exe],1))
+                    mis = "{0:3.2f}".format(exeList[exe]) #str(round(exeList[exe],2))
                     volaA = volList[indVola]
                     volaB = 1.-volaA
                     vec = nconc*aero[aeroK]
@@ -154,10 +154,10 @@ def interactive_aero_testi( testinumeroetuliite, aero, nconc, nf2aList, volList,
                     nf2a = str( nf2aList[frac] ) #ound(nf2aList[frac],3)
                     duConc = str(round((1-nf2aList[frac])*(vec[0] + vec[1] )*1000.,2))
                     print("DUST " + duConc + " #/g")
-                    testinumero = testinumeroetuliite + "DU_" +duConc +"g"   # "nf2a" + nf2a + + str(aero[aeroK]) +"volA" + str(round(volaA,2))+
+                    testinumero = testinumeroetuliite + mis + "_DU" +duConc +"g"   # "nf2a" + nf2a + + str(aero[aeroK]) ++
                     if aja:
                         #ajakomento(qsub="true", n = n, nf2a = nf2a, volDistA=volDistA, volDistB=volDistB, testinumero = testinumero, extra = extra, dim1 = "true", exe = "les.seq.Jaakko.JJAv5.2.1.intel.fast" )
-                        ajakomento(qsub="false", n = n, nf2a = nf2a, volDistA=volDistA, volDistB=volDistB, testinumero = testinumero, extra = extra, dim2 = "true", exe = "les.mpi.Jaakko.IceV1.0.mis" + mis + ".intel.fast", pikkuT = "7200.")
+                        ajakomento( qsub="true", n = n, nf2a = nf2a, volDistA=volDistA, volDistB=volDistB, testinumero = testinumero, extra = extra, dim3 = "true", exe = "les.mpi.Jaakko.IceV1.0.mis" + mis + ".intel.fast", pikkuT = "7200.")
                     if analysoi:
                         analysoiPrinttaaTaulukko(testinumero = testinumero)
 
@@ -166,6 +166,12 @@ def giveList_nf2a(sumnconc, duTargetList):
     for du in duTargetList:
         nf2aList.append(1-du/(sumnconc))
     return nf2aList
+
+def giveList_du(sumnconc, nf2aTargetList):
+    duList= [];
+    for nf2a in nf2aTargetList:
+        duList.append(sumnconc*(1-nf2a))
+    return duList
 
 aero        = [1.0] #[0.5, 1.5] #[0.75, 1.0, 1.25] #[0.1, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0]
 #nf2aList    = np.arange(0.99, 0.999, 0.001)
@@ -190,16 +196,21 @@ aero        = [1.0] #[0.5, 1.5] #[0.75, 1.0, 1.25] #[0.1, 0.25, 0.5, 0.75, 1.0, 
 volList = [0.99]
 print(volList)
 
-exeList = [0.7] #np.arange(0.1, 0.91, 0.1)
+exeList = [0.50, 0.60]#[0.50, 0.51, 0.52, 0.55, 0.59, 0.60, 0.61] #np.arange(0.5, 0.7, 0.05) #[0.7] #
 print(exeList)
-testinumeroetuliite = "Set"
+testinumeroetuliite = "MIS"
 nconc = np.asarray([155.24,    6.37])
 sumnconc = np.sum(nconc)
-dulist = np.concatenate( (np.asarray([1.]), np.arange(2.5, 10.1, 2.5)) )*1e-3
 
+dulist = np.concatenate( (np.asarray([1.]), np.arange(2.5, 10.1, 2.5)) )*1e-3
 nf2aList = giveList_nf2a( sumnconc, dulist  )
 nf2aList = np.flip( nf2aList )
-nf2aList = np.insert( nf2aList, 0 , 0.9999640353631664 ) 
+#nf2aList = np.insert( nf2aList, 0 , 0.9999640353631664 )
+
+#dulist = np.asarray([50.,100., 150.,200.])*1e-3
+#nf2aList = giveList_nf2a( sumnconc, dulist  )
+#nf2aList = np.flip( nf2aList )
+#nf2aList = np.insert( nf2aList, 0 , 0.999)
 print(nf2aList)
 
 debug = False

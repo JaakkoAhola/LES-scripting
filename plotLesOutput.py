@@ -55,7 +55,7 @@ if __name__ == "__main__":
     print('figure.dpi', mpl.rcParams['figure.dpi'])
     mpl.rcParams['savefig.dpi'] = 300.
     print('savefig.dpi', mpl.rcParams['savefig.dpi'])
-    mpl.rcParams['legend.fontsize'] = 12
+    mpl.rcParams['legend.fontsize'] = 14
     print('legend.fontsize', mpl.rcParams['legend.fontsize'])
 
     readFromFile = input("Do you want to read setups from file (y/n): ") in kylla
@@ -629,7 +629,6 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
             plt.savefig( picturefolder + savePrefix + saveTag + LVLprintSave + '.png')
 
             if legenda:
-                print("muuttuja legenda", muuttuja, legend, type(legend))
                 legendfolder = picturefolder + "/" + "legends/"
                 if not os.path.exists( legendfolder ):
                     os.makedirs( legendfolder )
@@ -3351,8 +3350,8 @@ if ICE:
                 tagii = "_" + tag[-1]
         except IndexError:
             tagii = "_"
-        legendaPaper= False
-
+        legendaPaper= True
+        kehitys = False
 
         for lwpmax in [50,60]:
             WPticks =  list(map(int, np.arange(0, lwpmax + .1 ,2)))
@@ -3425,13 +3424,19 @@ if ICE:
         #piirra_domainProfiili( 'P_rl', muunnosKerroin = 1000., longName = "Liquid water mixing ratio  " + r'$g/kg^{-1}$', useDN = False, transpose = True, colorBarTickValues = cbvalLIQ, colorBarTickNames = cbvalLIQStr, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = plt.cm.Reds, spinup = spinup, profiili = True ) # variKartta = profiiliVariLIQ
 
         #mdp.plot_suljetus(naytaPlotit)
-        kehitys = False
+
         if kehitys:
             origFig = mpl.rcParams['figure.figsize']
             mpl.rcParams['figure.figsize'] = [mpl.rcParams['figure.figsize'][0]*1.4, mpl.rcParams['figure.figsize'][1]*1.4]
             print("mpl.rcParams['figure.figsize']",mpl.rcParams['figure.figsize'])
             aikaPisteet      = xTicksSeconds[::4] # even hours
-            aika_color       = [ sns.color_palette(kartta, len(aikaPisteet)-1) for kartta in [ "Greens_r", "Blues_r", "Reds_r"]]
+            kehitysvarit = [ "Greens_r", "Blues_r", "Reds_r"]
+
+            while len(kehitysvarit) < len(tiedostolista):
+                kehitysvarit.insert(0, "Greens_r")
+
+
+            aika_color       = [ sns.color_palette(kartta, len(aikaPisteet)-1) for kartta in kehitysvarit]
             for ac in aika_color:
                 ac.insert(0, (0,0,0))
 

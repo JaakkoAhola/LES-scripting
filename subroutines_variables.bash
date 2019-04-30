@@ -276,7 +276,7 @@ function jatkokasittelesimulaatio {
 
             echo 'Simulaatio' $simulation  'valmis'
             poistaturhat $simulation $outputname $folderROOT
-            rsync -avz ${folderROOT}/${simulation}/ /ibrix/arch/ClimRes/aholaj/ISDAC/${simulation}/
+            #rsync -avz ${folderROOT}/${simulation}/ /ibrix/arch/ClimRes/aholaj/ISDAC/${simulation}/
             #rm -rf ${folderROOT}/${simulation}/
 
 

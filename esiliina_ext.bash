@@ -4,7 +4,7 @@
 set -e
 # echo eka $1 toka $2 kolmas $3 neljas $4
 
-# import subroutines & variables 
+# import subroutines & variables
 if [[ -d ${SCRIPT} ]]; then
    scriptref=${SCRIPT}
 else
@@ -17,7 +17,7 @@ function looppaatarkastapoista {
 
     for i in $(ls -d  ${loopFolders}* )
     do
-        
+
         echo $i
         jatkokasittelesimulaatio $i
         echo " "
