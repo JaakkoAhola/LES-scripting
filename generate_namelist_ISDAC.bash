@@ -26,7 +26,7 @@ cat > ${dir}/NAMELIST <<EOF
   dzmax  = ${dzmax:-1200.}
   dzrat  = ${dzrat:-1.05}
   dtlong = ${dtlong:-1.}
-  distim = ${distim:-100.}
+  distim = ${distim:-300.}
   timmax = ${timmax:-28800.}
   Tspinup = ${Tspinup:-7200.}
 
@@ -39,13 +39,8 @@ ${jaakkoNL}  minispinupCase02 = ${minispinupCase02:-3}
 
   nudge_theta = ${nudge_theta:-3}
   nudge_rv    = ${nudge_rv:-3}
-  nudge_u     = ${nudge_u:-3}
-  nudge_v     = ${nudge_v:-3}
-
-  tau_theta   = ${tau_theta:-1.}
-  tau_rv      = ${tau_rv:-1.}
-  tau_u       = ${tau_u:-2.}
-  tau_v       = ${tau_v:-2.}
+  nudge_u     = ${nudge_u:-4}
+  nudge_v     = ${nudge_v:-4}
 
 
   runtype = ${runtype:-'"INITIAL"'}
@@ -59,12 +54,12 @@ ${jaakkoNL}  minispinupCase02 = ${minispinupCase02:-3}
   frqhis  = ${frqhis:-1800.}
   istpfl  = ${istpfl:-1}
   lbinanl = ${lbinanl:-.true.}
-  frqanl = ${frqanl:-120.}
+  frqanl = ${frqanl:-3600.}
   corflg = ${corflg:-.false.}
   ipsflg = ${ipsflg:-1}
   itsflg = ${itsflg:-1}
   sed_aero = ${sed_aero:-.FALSE.}
-  sed_cloud = ${sed_cloud:-.TRUE.}
+  sed_cloud = ${sed_cloud:-.FALSE.}
   sed_precp = ${sed_precp:-.FALSE.}
   sed_ice = ${sed_ice:-.TRUE.}
   sed_snow = ${sed_snow:-.FALSE.}
@@ -92,6 +87,7 @@ ${jaakkoNL}  minispinupCase02 = ${minispinupCase02:-3}
 
   zrand = ${zrand:-825.}
   zrndamp = ${zrndamp:-0.1} ! the amplitude of pseudorandom fluctuations
+  zrndampq = ${zrndampq:-0.0} 
  /
 
  &salsa
@@ -132,9 +128,9 @@ ${jaakkoNL}  minispinupCase02 = ${minispinupCase02:-3}
    nlicmelt    = ${nlicmelt:-.FALSE.}    ! Switch for ice'n' snow melting
    nlicenucl   = ${nlicenucl:-.TRUE.}   ! Switch for ice nucleation
 
-${interactive}   ice_hom     = ${ice_hom:-.TRUE.}
+${interactive}   ice_hom     = ${ice_hom:-.FALSE.}
 ${interactive}   ice_imm     = ${ice_imm:-.TRUE.}
-${interactive}   ice_dep     = ${ice_dep:-.TRUE.}
+${interactive}   ice_dep     = ${ice_dep:-.FALSE.}
 
 ${interactiveNOT}   fixINC      = ${fixINC:-1.0}         ! fixed ice number concentration #/L, nlfixinc should be set to true inorder to have this working
 

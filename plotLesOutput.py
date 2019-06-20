@@ -1385,7 +1385,7 @@ def piirra_maksimiKeissit( muuttuja, muunnosKerroin = 1.0, longName = 'pitka nim
 
         lista[i] = np.max( muuttuja_Tdata[aikaP:] )
 
-    fig, ax = mdp.plottaa( jarjestys, lista, tit = longName+ ' ' + tag + LVLprintFig, xl = xlabel, yl = ylabel, changeColor = True, markers = True, uusikuva = True, gridi = False, tightXAxis = False, tightYAxis = True, LEGEND = False )
+    fig, ax, leg = mdp.plottaa( jarjestys, lista, tit = longName+ ' ' + tag + LVLprintFig, xl = xlabel, yl = ylabel, changeColor = True, markers = True, uusikuva = True, gridi = False, tightXAxis = False, tightYAxis = True, LEGEND = False )
 
     mdp.plot_setYlim( 0., max(lista), extendBelowZero = False, A = 0.05 )
     #print map(str, xTikit)
@@ -3445,9 +3445,30 @@ if ICE:
             #aikaTIT         = 'time [h]'
             #cbvalTStr       = list(map(str, xTicksSeconds))
 
+            piirra_profiiliKehitys( 'theta',  variKartta = aika_color, longName =  'Potential temperature', xlabel = r'$\theta$' + ' [K]', ylabel = 'z [m]', savePrefix = 'evol01_theta', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True, xTikit = range(263, 273), xmin = 263., xmax = 273.5, viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
 
-            piirra_profiiliKehitys( 'theta',  variKartta = aika_color, longName =  'Potential temperature', xlabel = r'$\theta$' + ' [K]', ylabel = 'z [m]', savePrefix = 'theta_evol', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True, xTikit = range(263, 273), xmin = 263., xmax = 273.5, viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_cH2Oi',  variKartta = aika_color, longName =  'SALSA total mass mixing ratio of H2O in ice', xlabel = 'kg/kg', ylabel = 'z [m]', savePrefix = 'evol02_cH2Oi', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
 
+
+            piirra_profiiliKehitys( 'P_ri',  variKartta = aika_color, longName =  'Ice water mixing ratio', xlabel = 'kg/kg', ylabel = 'z [m]', savePrefix = 'evol03_P_ri', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
+
+            piirra_profiiliKehitys( 'P_rl',  variKartta = aika_color, longName =  'Cloud water mixing ratio', xlabel = 'kg/kg', ylabel = 'z [m]', savePrefix = 'evol04_P_rl', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
+
+            piirra_profiiliKehitys( 'P_Nia',  variKartta = aika_color, longName =  'SALSA ice number concentration in regime A', xlabel = '#/kg', ylabel = 'z [m]', savePrefix = 'evol05_P_Nia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
+
+            piirra_profiiliKehitys( 'P_Nib',  variKartta = aika_color, longName =  'SALSA ice number concentration in regime B', xlabel = '#/kg', ylabel = 'z [m]', savePrefix = 'evol06_P_Nib', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
+
+
+            piirra_profiiliKehitys( 'P_Rwia',  variKartta = aika_color, longName =  'SALSA mean ice radius, regime A', xlabel = 'm', ylabel = 'z [m]', savePrefix = 'evol07_P_Rwia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            mdp.plot_suljetus(naytaPlotit)
+
+            piirra_profiiliKehitys( 'P_Rwib',  variKartta = aika_color, longName =  'SALSA mean ice radius, regime B', xlabel = 'm', ylabel = 'z [m]', savePrefix = 'evol08_P_Rwia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus(naytaPlotit)
 
             mpl.rcParams['figure.figsize'] = origFig

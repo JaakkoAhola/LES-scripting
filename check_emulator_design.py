@@ -54,9 +54,9 @@ os.chdir(cwd)
 ########################################
 
 # default values
-DAY = True
+DAY = False
 explicitAerosol = True
-writeNetCDF = False
+writeNetCDF = True
 
 
 apu = []

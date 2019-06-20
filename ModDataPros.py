@@ -657,9 +657,9 @@ def profiiliTulostus( data, aikaPisteet = 0, korkeus=0,label = None, tulostus = 
 
   if isinstance( aikaPisteet, np.ndarray) or isinstance( aikaPisteet, list):
       for t in aikaPisteet:
-        profiiliTulostus.fig, profiiliTulostus.ax = plottaa( data[t,:], korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle )
+        profiiliTulostus.fig, profiiliTulostus.ax, profiiliTulostus.legend = plottaa( data[t,:], korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle )
   else:
-      profiiliTulostus.fig, profiiliTulostus.ax = plottaa( data, korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle )
+      profiiliTulostus.fig, profiiliTulostus.ax, profiiliTulostus.legend = plottaa( data, korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle )
 
 
   return profiiliTulostus.fig, profiiliTulostus.ax
