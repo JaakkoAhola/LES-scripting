@@ -3351,7 +3351,7 @@ if ICE:
         except IndexError:
             tagii = "_"
         legendaPaper= True
-        kehitys = False
+        kehitys = True
 
         for lwpmax in [50,60]:
             WPticks =  list(map(int, np.arange(0, lwpmax + .1 ,2)))

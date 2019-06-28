@@ -196,9 +196,9 @@ aero        = [1.0] #[0.5, 1.5] #[0.75, 1.0, 1.25] #[0.1, 0.25, 0.5, 0.75, 1.0, 
 volList = [0.50]
 print(volList)
 
-exeList = ["les.mpi.Jaakko.IceV1.2.intel.fast"]# [0.56]#[0.50, 0.51, 0.52, 0.55, 0.59, 0.60, 0.61] #np.arange(0.5, 0.7, 0.05) #[0.7] #
+exeList = ["les.mpi.Jaakko.IceV1.3.intel.fast"]# [0.56]#[0.50, 0.51, 0.52, 0.55, 0.59, 0.60, 0.61] #np.arange(0.5, 0.7, 0.05) #[0.7] #
 print(exeList)
-testinumeroetuliite = "icev1.2"
+testinumeroetuliite = "icev1.3"
 nconc = np.asarray([155.24,    6.37])
 sumnconc = np.sum(nconc)
 
