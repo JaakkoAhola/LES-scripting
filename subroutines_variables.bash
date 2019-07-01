@@ -374,7 +374,7 @@ function tarkistastatus {
     #### LESin STATUS
     #################
     for f in ${folderROOT}/${simulation}/NAMELIST; do
-        [ -e "$f" ] && timmaxapu=$(cat ${folderROOT}/${simulation}/NAMELIST | grep timmax) && timmax=$(python -c "print('${timmaxapu}'.split('=')[1].replace('.', '').replace(' ', ''))") || timmax=100000000
+        [ -e "$f" ] && timmaxapu=$(cat ${folderROOT}/${simulation}/NAMELIST | grep timmax) && timmax=$(python -c "print('${timmaxapu}'.split('=')[1].split('.')[0].replace(' ', ''))") || timmax=100000000
         break
     done
     apulast=0
