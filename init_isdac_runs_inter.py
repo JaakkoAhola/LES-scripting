@@ -10,7 +10,6 @@ import sys
 import os
 import getopt
 import f90nml as nml
-import json
 
 global debug, vmD, vmF
 
@@ -21,6 +20,7 @@ override = True
 # auxiliary variables
 vmD = "/"
 vmF  = "_"
+
 
 ###################################
 ###                             ###
@@ -37,7 +37,7 @@ radiationinputD = binD
 
 #filenames in inputD directory
 soundinF  = "sound_in3.5"
-namelistF = "NAMELIST_fixedinc"
+namelistF = "NAMELIST_inter"
 # binary name in binD directory
 exeF = "les.mpi.IceDevel_Jaakko_Isdac.IceD.intel.fast"
 
@@ -110,54 +110,48 @@ nmlbaseDict = nml.read(nmlbaseV)
 
 
 if debug:
-    iceList  = [0]
     timeList = [8]
 else:
-    iceList  = [0,1,2,3,4,5,6]
     timeList = [8,24]
 
-for iceConc in iceList:
-    for hours in timeList: #[28800., 86400.]:
 
-        if iceConc in [0,5,6] and hours == 24:
-            continue
+for hours in timeList:
 
-        if hours == 24:
-            walltime = "36:00:00"
-        else:
-            walltime = "24:00:00"
-        print(" ")
-        print(" ")
+    if hours == 24:
+        walltime = "36:00:00"
+    else:
+        walltime = "24:00:00"
+    print(" ")
+    print(" ")
 
-        iceBase = 769.
-        postfix = vmF.join( ["iceD", str(iceConc), str(hours) + "h" ] ) # AS INPUT
+    postfix = vmF.join( ["iceD", "inter", str(hours) + "h" ] ) # AS INPUT
 
-        # derived
-        name = vmF.join( [ prefix, postfix ] )
-        outputD = vmD.join( [outputrootD, name] )
+    # derived
+    name = vmF.join( [ prefix, postfix ] )
+    outputD = vmD.join( [outputrootD, name] )
 
-        ### modify namelist values
-        model_nml = "model"
-        nmlbaseDict[model_nml]['filprf'] = name
-        nmlbaseDict[model_nml]['hfilin'] = name + ".rst"
-        nmlbaseDict[model_nml]['timmax'] = hours*3600.
+    ### modify namelist values
+    model_nml = "model"
+    nmlbaseDict[model_nml]['filprf'] = name
+    nmlbaseDict[model_nml]['hfilin'] = name + ".rst"
+    nmlbaseDict[model_nml]['timmax'] = hours*3600.
 
-        salsa_nml = "salsa"
-        nmlbaseDict[salsa_nml]["fixinc"] = iceConc*iceBase
+    salsa_nml = "salsa"
+    
 
-        #######################################################################
-        ###### radiation sounding
-        radiationP, radiationV, radiationD, radoutputD, radB = submitMet.radiationSounding( nmlbaseDict, radiationinputD, outputD )
+    #######################################################################
+    ###### radiation sounding
+    radiationP, radiationV, radiationD, radoutputD, radB = submitMet.radiationSounding( nmlbaseDict, radiationinputD, outputD )
 
-        # dir making
-        submitMet.makeDirectories( outputD = outputD, radB = radB, radoutputD=radoutputD )
+    # dir making
+    submitMet.makeDirectories( outputD = outputD, radB = radB, radoutputD=radoutputD )
 
-        # namelist file writing
-        submitMet.writeNamelist( nmlbaseDict, outputD )
+    # namelist file writing
+    submitMet.writeNamelist( nmlbaseDict, outputD )
 
-        # copying files
-        submitMet.copyFiles(exeV, soundinV, outputD )
-        
-        # create bash job script
-        submitMet.createPBSJobScript( jobname = vmF.join( ["LES", str(iceConc), str(hours) + "h" ] ), nproc = nproc, WT = walltime, rundir = outputD, exe = exeF)
-        #######################################################################
+    # copying files
+    submitMet.copyFiles(exeV, soundinV, outputD )
+    
+    # create bash job script
+    submitMet.createPBSJobScript( jobname = vmF.join( ["LES", "i", str(hours) + "h" ] ), nproc = nproc, WT = walltime, rundir = outputD, exe = exeF)
+    #######################################################################
