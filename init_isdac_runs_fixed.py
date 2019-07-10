@@ -6,6 +6,8 @@ Created on Wed Jun 26 13:29:01 2019
 @author: aholaj
 """
 import submit_uclales_salsa_methods as submitMet
+import PythonMethods as pm
+
 import sys
 import os
 import getopt
@@ -15,83 +17,99 @@ import json
 global debug, vmD, vmF
 
 
-debug = False
-override = True
+
 
 # auxiliary variables
 vmD = "/"
 vmF  = "_"
 
-###################################
-###                             ###
-### input parameters CHANGEABLE ###
-###                             ###
-###################################
+############################################
+###                                      ###
+### input parameters read from json file ###
+###                                      ###
+############################################
 
-# directories
-inputD           = os.environ["ISDAC"]
-outputrootD      = os.environ["LUSTRE"]
-binD             = os.environ["BIN"]
+#default value for json file (can be given as command line argument 
+jsonfile ="fixed_runs.json" # CHANGE THIS DEBUGKEBAB BEFORE COMMIT
 
-radiationinputD = binD
-
-#filenames in inputD directory
-soundinF  = "sound_in3.5"
-namelistF = "NAMELIST_fixedinc"
-# binary name in binD directory
-exeF = "les.mpi.IceDevel_Jaakko_Isdac.IceD.intel.fast"
-
-# parameters used to determine output location
-case_name = "isdac"
-lvl = 5
-dim = 3
-
-# supercomputer parameters
-nproc = 64 # number of processors
-### command line arguments
-argv = sys.argv[1:]
+# read command line arguments
 try:
-    opts, args = getopt.getopt(argv,"h:",[ \
-                                          "inputD=",\
-                                          "outputrootD=",\
-                                          "binD=",\
-                                          "radiationinputD=",\
-                                          "soundinF=",\
-                                          "namelistF=",\
-                                          "exeF=",\
-                                          "case_name=",\
-                                          "lvl=",\
-                                          "dim=",\
-                                          "nproc="])
+    opts, args = getopt.getopt(sys.argv,"h:",[ \
+                                          "jsonfile="])
 except getopt.GetoptError:
-   print('ERROR, usage: .py -i <inputfile> -o <outputfile>')
+   print('ERROR, usage: .py --i=<input json file>')
    sys.exit(2)
 for opt, arg in opts:
     if opt == '-h':
         print('.py -i <inputfile> -o <outputfile>')
         sys.exit()
-    elif opt in ("--inputD"):
-        inputD = arg
-    elif opt in ("--outputrootD"):
-        outputrootD = arg
-    elif opt in ("--binD"):
-        binD = arg
-    elif opt in ("--radiationinputD"):
-        radiationinputD = arg
-    elif opt in ("--soundinF"):
-        soundinF = arg    
-    elif opt in ("--namelistF"):
-        namelistF = arg
-    elif opt in ("--exeF"):
-        exeF = arg
-    elif opt in ("--case_name"):
-        case_name = arg
-    elif opt in ("--lvl"):
-        lvl = arg
-    elif opt in ("--dim"):
-        dim = arg
-    elif opt in ("--nproc"):
-        nproc = arg    
+    elif opt in ("--jsonfile"):
+        jsonfile = arg
+
+# read json file
+with open ("fixed_runs.json") as jsonfilu:
+    jsondata = json.load(jsonfilu)        
+
+debug = pm.stringToBoolean( jsondata["debug"] )
+override = pm.stringToBoolean( jsondata["override"] )
+
+###########################
+# read inputset from json #
+###########################
+jsonSet = "inputset"
+####################
+
+
+##############################
+# read directories from json #
+##############################
+jsonSubSet = "directories" 
+##########################
+
+useEnvVarBool = pm.stringToBoolean( jsondata[  jsonSet  ][ jsonSubSet  ][ "useEnvVarBool" ] ) # if directory parameters are given as environment variables
+
+inputD          = jsondata[  jsonSet  ][  jsonSubSet  ][ "inputD" ]
+outputrootD     = jsondata[  jsonSet  ][  jsonSubSet  ][ "outputrootD" ]
+binD            = jsondata[  jsonSet  ][  jsonSubSet  ][ "binD" ]
+radiationinputD = jsondata[  jsonSet  ][  jsonSubSet  ][ "radiationinputD" ]
+
+if useEnvVarBool:
+    inputD          = os.environ[ inputD ]
+    outputrootD     = os.environ[ outputrootD ]
+    binD            = os.environ[ binD ]
+    radiationinputD = os.environ[ radiationinputD ]
+    
+########################
+# read files from json #
+########################
+jsonSubSet = "files"
+####################
+
+#filenames in inputD directory
+soundinF  = jsondata[  jsonSet  ][  jsonSubSet  ][ "soundinf" ]
+namelistF = jsondata[  jsonSet  ][  jsonSubSet  ][ "namelistF" ]
+# binary name in binD directory
+exeF = jsondata[  jsonSet  ][  jsonSubSet  ][ "exeF" ]
+
+###################################
+# read outputparameters from json #
+###################################
+jsonSubSet = "outputparameters"
+###############################
+
+case_name = jsondata[  jsonSet  ][  jsonSubSet  ][ "case_name" ]
+lvl = jsondata[  jsonSet  ][  jsonSubSet  ][ "lvl" ]
+dim = jsondata[  jsonSet  ][  jsonSubSet  ][ "dim" ]
+
+###########################################
+# read supercomputer parameters from json #
+###########################################
+jsonSubSet = "supercomputerparameters"
+###############################
+# 
+nproc = jsondata[  jsonSet  ][  jsonSubSet  ][ "nproc" ] # number of processors
+
+
         
 ######################################
 ######################################

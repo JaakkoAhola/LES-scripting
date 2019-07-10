@@ -1,0 +1,33 @@
+{
+"debug" : "True",
+"override" : "True",
+"inputset" : {
+            "directories" : {
+                            "useEnvVarBool" : "True",
+                            "inputD": "ISDAC",
+                            "outputrootD" : "LUSTRE",
+                            "binD" : "BIN",
+                            "radiationinputD": "BIN"
+                            },
+            "files" : {
+                            "soundinf": "sound_in3.5",
+                            "namelistF" : "NAMELIST_inter",
+                            "exeF" : "les.mpi.IceDevel_Jaakko_Isdac.IceD.intel.fast"
+                            },
+            "outputparameters" : {
+                            "case_name" : "isdac",
+                            "lvl" : 5,
+                            "dim" : 3
+                            },
+            "supercomputerparameters" : {
+                            "nproc" : 64
+                            }
+            },
+"simulationset" : {
+            namelistset: {
+                        "model" : {
+                        "filprf" : []
+                    }
+                }
+}
+}
