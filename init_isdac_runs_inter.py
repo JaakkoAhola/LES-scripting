@@ -11,14 +11,13 @@ import os
 import getopt
 import f90nml as nml
 
-global debug, vmD, vmF
+global debug, vmF
 
 
 debug = False
 override = True
 
 # auxiliary variables
-vmD = "/"
 vmF  = "_"
 
 
@@ -79,7 +78,7 @@ for opt, arg in opts:
     elif opt in ("--radiationinputD"):
         radiationinputD = arg
     elif opt in ("--soundinF"):
-        soundinF = arg    
+        soundinF = arg
     elif opt in ("--namelistF"):
         namelistF = arg
     elif opt in ("--exeF"):
@@ -91,17 +90,17 @@ for opt, arg in opts:
     elif opt in ("--dim"):
         dim = arg
     elif opt in ("--nproc"):
-        nproc = arg    
-        
+        nproc = arg
+
 ######################################
 ######################################
 ######################################
 
 
 # variables derived from input parameters
-nmlbaseV = vmD.join([inputD, namelistF])
-soundinV = vmD.join([inputD, soundinF])
-exeV     = vmD.join([binD, exeF])
+nmlbaseV = os.path.join( inputD, namelistF )
+soundinV = os.path.join( inputD, soundinF )
+exeV     = os.path.join( binD, exeF )
 
 prefix   = vmF.join(["case", case_name, "LVL" + str(lvl), str(dim) + "D"])
 
@@ -128,7 +127,7 @@ for hours in timeList:
 
     # derived
     name = vmF.join( [ prefix, postfix ] )
-    outputD = vmD.join( [outputrootD, name] )
+    outputD = os.path.join( outputrootD, name )
 
     ### modify namelist values
     model_nml = "model"
@@ -137,7 +136,7 @@ for hours in timeList:
     nmlbaseDict[model_nml]['timmax'] = hours*3600.
 
     salsa_nml = "salsa"
-    
+
 
     #######################################################################
     ###### radiation sounding
@@ -151,7 +150,7 @@ for hours in timeList:
 
     # copying files
     submitMet.copyFiles(exeV, soundinV, outputD )
-    
+
     # create bash job script
     submitMet.createPBSJobScript( jobname = vmF.join( ["LES", "i", str(hours) + "h" ] ), nproc = nproc, WT = walltime, rundir = outputD, exe = exeF)
     #######################################################################

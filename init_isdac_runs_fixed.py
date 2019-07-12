@@ -14,13 +14,12 @@ import getopt
 import f90nml as nml
 import json
 
-global debug, vmD, vmF
+global debug, vmF
 
 
 
 
 # auxiliary variables
-vmD = "/"
 vmF  = "_"
 
 ############################################
@@ -29,7 +28,7 @@ vmF  = "_"
 ###                                      ###
 ############################################
 
-#default value for json file (can be given as command line argument 
+#default value for json file (can be given as command line argument
 jsonfile ="fixed_runs.json" # CHANGE THIS DEBUGKEBAB BEFORE COMMIT
 
 # read command line arguments
@@ -48,7 +47,7 @@ for opt, arg in opts:
 
 # read json file
 with open ("fixed_runs.json") as jsonfilu:
-    jsondata = json.load(jsonfilu)        
+    jsondata = json.load(jsonfilu)
 
 debug = pm.stringToBoolean( jsondata["debug"] )
 override = pm.stringToBoolean( jsondata["override"] )
@@ -63,7 +62,7 @@ jsonSet = "inputset"
 ##############################
 # read directories from json #
 ##############################
-jsonSubSet = "directories" 
+jsonSubSet = "directories"
 ##########################
 
 useEnvVarBool = pm.stringToBoolean( jsondata[  jsonSet  ][ jsonSubSet  ][ "useEnvVarBool" ] ) # if directory parameters are given as environment variables
@@ -78,7 +77,7 @@ if useEnvVarBool:
     outputrootD     = os.environ[ outputrootD ]
     binD            = os.environ[ binD ]
     radiationinputD = os.environ[ radiationinputD ]
-    
+
 ########################
 # read files from json #
 ########################
@@ -106,20 +105,20 @@ dim = jsondata[  jsonSet  ][  jsonSubSet  ][ "dim" ]
 ###########################################
 jsonSubSet = "supercomputerparameters"
 ###############################
-# 
+#
 nproc = jsondata[  jsonSet  ][  jsonSubSet  ][ "nproc" ] # number of processors
 
 
-        
+
 ######################################
 ######################################
 ######################################
 
 
 # variables derived from input parameters
-nmlbaseV = vmD.join([inputD, namelistF])
-soundinV = vmD.join([inputD, soundinF])
-exeV     = vmD.join([binD, exeF])
+nmlbaseV = os.path.join( inputD, namelistF )
+soundinV = os.path.join( inputD, soundinF )
+exeV     = os.path.join( binD, exeF )
 
 prefix   = vmF.join(["case", case_name, "LVL" + str(lvl), str(dim) + "D"])
 
@@ -152,7 +151,7 @@ for iceConc in iceList:
 
         # derived
         name = vmF.join( [ prefix, postfix ] )
-        outputD = vmD.join( [outputrootD, name] )
+        outputD = os.path.join( outputrootD, name )
 
         ### modify namelist values
         model_nml = "model"
@@ -175,7 +174,7 @@ for iceConc in iceList:
 
         # copying files
         submitMet.copyFiles(exeV, soundinV, outputD )
-        
+
         # create bash job script
         submitMet.createPBSJobScript( jobname = vmF.join( ["LES", str(iceConc), str(hours) + "h" ] ), nproc = nproc, WT = walltime, rundir = outputD, exe = exeF)
         #######################################################################
