@@ -1849,18 +1849,19 @@ def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, lo
 
 
 
-        ajat  =  np.round( mdp.read_Data( filenameNC[0], 'time' ), 0 )
+        ajat  =  np.round( mdp.read_Data( tiedostonimi[0], 'time' ), 0 )
 
         oikeatXtikit = np.zeros( ( np.shape( xticks ) ))
 
         for tt in range(len(xticks)):
             oikeatXtikit[tt] = np.argmin( np.abs(ajat - 3600.*xticks[tt]) )
+        oikeatXtikit = oikeatXtikit.astype(int)
 
-        oikeatXleimat= tuple(map( int, oikeatXtikit ))
+        oikeatXleimat = ajat[oikeatXtikit]/3600.
+        oikeatXleimat = oikeatXleimat.astype(int)
 
         ax.set_xticks( oikeatXtikit )
         ax.set_xticklabels( oikeatXleimat )
-
 
         k = 0
         for label in ax.xaxis.get_ticklabels():
