@@ -15,9 +15,11 @@ import glob
 from netCDF4 import Dataset
 from PythonMethods import myRound
 from PythonMethods import myRoundFloat
+import PythonMethods as pm
 import xarray as xr
 import re
 import matplotlib.ticker as ticker
+import pandas as pd
 global piirra, tulostus, tightXAxis, saveFig, LEGEND, tag, kylla, emuloo, setupFileHandler, readFromFile
 
 ####################################################
@@ -401,8 +403,10 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
 
     nollatapaus = 0
     print(" ")
-    if tallenna:
-        f = open(picturefolder + muuttuja + '.csv','w')
+
+    time_dataLen = 0
+    time_dataLongest = None
+    updateDictTimeColumn = False
 
     for i in range(len(tiedostolista)):
         uusikuva = True if i == 0 else  False
@@ -434,7 +438,14 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
 
 
 
-        time_data       = mdp.read_Data( tiedostonimi[i], 'time'  )
+        time_data    = mdp.read_Data( tiedostonimi[i], 'time'  )
+        if len(time_data) > time_dataLen:
+            time_dataLen     = len(time_data)
+            time_dataLongest = time_data
+
+            if not uusikuva:
+                updateDictTimeColumn = True
+
         try:
             muuttuja_Tdata  = mdp.read_Data( tiedostonimi[i], muuttuja )*muunnosKerroin
             plottausOnnistuu = True
@@ -545,31 +556,34 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
             nimi = longName + ' ' + tag
             label = labelArray[i]
 
+        if tallenna:
+            muuttujaCSV = muuttuja
+            if muuttujaCSV.endswith("_bar"):
+                muuttujaCSV = muuttujaCSV[:-4].upper()
+
+            if uusikuva or updateDictTimeColumn:
+                timeIndDict = "".join(["time", xlabel])
+                aikasarjaDict = dict(zip([timeIndDict], [time_data/3600.]))
+
+            yarvot = pm.pad( list(muuttuja_Tdata), time_dataLen, padding=np.nan )
+
+            aikasarjaDict.update(dict(zip([" ".join([label, muuttujaCSV, ylabel])], [yarvot])))
+
         fig, ax, legend = mdp.aikasarjaTulostus( muuttuja_Tdata, time_data,  tulostus = tulostus, piirra = piirra, uusikuva = uusikuva, nimi = nimi, xnimi = xlabel, ynimi = ylabel, tightXAxis=tightXAxis, LEGEND=legenda, omavari = omavari, label = label )
 
         if muuttuja2 is not None:
             fig, ax, legend = mdp.aikasarjaTulostus( muuttuja_Tdata2, time_data,  tulostus = tulostus, piirra = piirra, uusikuva = False, nimi = nimi, xnimi = xlabel, ynimi = ylabel, tightXAxis=tightXAxis, LEGEND=legenda, omavari = omavari, label = label, changeColor = False )
 
 
-        if tallenna:
-            prefixtallenna = 15
-            if uusikuva:
-                f.write("{0};".format(muuttuja.ljust(prefixtallenna)) )
-                tempaikaLeima = "{0};".format("time[s]".ljust(prefixtallenna))
-                for aikahetki in time_data:
-                    tempaikaLeima = tempaikaLeima + "{0};".format(aikahetki.ljust(prefixtallenna))
-                f.write(tempaikaLeima)
 
-            temparvoleima = "{0};".format(case_indeksi.ljust(prefixtallenna))
-            for arvohetki in muuttuja_Tdata:
-                temparvoleima = temparvoleima + "{0};".format(arvohetki.ljust(prefixtallenna))
+
 
         #######################
     if plottausOnnistuu:
         print(muuttuja, 'nollatapauksia yhteensa', nollatapaus)
         #print 'muuttuja', muuttuja, 'indeksi min', minInd, 'arvo min', minimi, 'indeksi max', maksInd, 'arvo max', maksimi
 
-        xticksHours = np.arange(0., max(time_data)/3600. + 0.1, 0.5)
+        xticksHours = np.arange(0., max(time_dataLongest)/3600. + 0.1, 0.5)
 
         xticks = xticksHours * 3600.
 
@@ -638,7 +652,10 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
                     os.makedirs( legendfolder )
                 mdp.export_legend(legend, filename = legendfolder + muuttuja + "_"  + "legend.png"   )
 
-
+            if tallenna:
+                df = pd.DataFrame(data=aikasarjaDict)
+                df = df.set_index(timeIndDict)
+                df.to_csv(picturefolder + savePrefix + saveTag + LVLprintSave + '.csv', sep=";")
 
 
 
@@ -3357,12 +3374,13 @@ if ICE:
             tagii = "_"
         legendaPaper= False
         kehitys = True
+        tallennaCSV = True
 
         for lwpmax in [50,60]:
             WPticks =  list(map(int, np.arange(0, lwpmax + .1 ,2)))
             WPlabels = list(map(str, WPticks))
 
-            piirra_aikasarjasettii( muuttuja = 'lwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel = r'[$10^{-3}kg/m^2$]', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'lwp' + tagii + str(lwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper  )
+            piirra_aikasarjasettii( muuttuja = 'lwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel = r'[$10^{-3}kg/m^2$]', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'lwp' + tagii + str(lwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 
@@ -3371,24 +3389,24 @@ if ICE:
             WPticks = list(map(int, np.arange(0,iwpmax + .1,1)))
             WPlabels = list(map(str, WPticks))
 
-            piirra_aikasarjasettii( muuttuja = 'iwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel = r'[$10^{-3}kg/m^2$]', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'iwp' + tagii + str(iwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3, legenda = legendaPaper  )
+            piirra_aikasarjasettii( muuttuja = 'iwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel = r'[$10^{-3}kg/m^2$]', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'iwp' + tagii + str(iwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3, legenda = legendaPaper, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 
 
-        piirra_aikasarjasettii( muuttuja = 'zc', muuttuja2 = 'zb',     longName= '', ylabel = 'height [m]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cloud_top_base' + tagii + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = korkeustikit, ylabels = ylabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel,  legenda = legendaPaper, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3) #piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3,
+        piirra_aikasarjasettii( muuttuja = 'zc', muuttuja2 = 'zb',     longName= '', ylabel = 'height [m]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cloud_top_base' + tagii + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = korkeustikit, ylabels = ylabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel,  legenda = legendaPaper, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3, tallenna = tallennaCSV) #piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3,
 
         mdp.plot_suljetus( not naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'Nc_ic', muunnosKerroin = 1.e-6, longName = 'in-cloud CDNC', ylabel = r'[$\#/10^{-6}kg$]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cdnc' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+        piirra_aikasarjasettii( muuttuja = 'Nc_ic', muunnosKerroin = 1.e-6, longName = 'in-cloud CDNC', ylabel = r'[$\#/10^{-6}kg$]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cdnc' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
 
         mdp.plot_suljetus( not naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = 'Ice number concentration', ylabel = r'[$\#/10^{-3}kg$]', asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = 'Ice number concentration', ylabel = r'[$\#/10^{-3}kg$]', asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
 
         mdp.plot_suljetus( not naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'wmax', longName = 'Maximum vertical velocity', ylabel = '[m/s]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True )
+        piirra_aikasarjasettii( muuttuja = 'wmax', longName = 'Maximum vertical velocity', ylabel = '[m/s]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True, tallenna = tallennaCSV )
 
         mdp.plot_suljetus( not naytaPlotit)
 
@@ -3401,7 +3419,7 @@ if ICE:
 
         WPticks = np.arange(0,6.1,1)
         WPlabels = list(map(str, WPticks))
-        piirra_aikasarjasettii( muuttuja = 'rmH2Oic',     muunnosKerroin = 1.e6,  longName = '', ylabel = r'[$10^{-6} kg m^{-2} s^{-1}$]', asetaRajat = RajausFlag, ymin = 0.0, ymax=WPticks[-1], extendBelowZero = False,  savePrefix = 'depIce', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 5, askChangeOfVariable = askChangeOfVariable, legenda = legendaPaper )
+        piirra_aikasarjasettii( muuttuja = 'rmH2Oic',     muunnosKerroin = 1.e6,  longName = '', ylabel = r'[$10^{-6} kg m^{-2} s^{-1}$]', asetaRajat = RajausFlag, ymin = 0.0, ymax=WPticks[-1], extendBelowZero = False,  savePrefix = 'depIce', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 5, askChangeOfVariable = askChangeOfVariable, legenda = legendaPaper, tallenna = tallennaCSV )
 
         mdp.plot_suljetus( not naytaPlotit)
 
@@ -3409,12 +3427,12 @@ if ICE:
         ["rmDUic", "Deposition of DU with ice", r'$kg m^{-2} s^{-1}$', 1.e12],
         ["rmDUcl", "Deposition of dust with of clouds", r'$kg m^{-2} s^{-1}$', 1.e6],
         ["DU_ii", "Dust mass mixing ratio in ice", "kg/kg", 1.e12], ["DU_ic", "Cloud droplet DU mass mixing ratio", "kg/kg", 1.e12], ["DU_int", "DU mass mixing ratio in interstitial aerosols", "kg/kg", 1.e12 ]]:
-            piirra_aikasarjasettii( muuttujaTemp, longName =nameTemp, ylabel = r'[$10^{' + str(-int(np.log10(muunnosTemp)))+'}$'+ unitTemp+ ']', muunnosKerroin = muunnosTemp, asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+            piirra_aikasarjasettii( muuttujaTemp, longName =nameTemp, ylabel = r'[$10^{' + str(-int(np.log10(muunnosTemp)))+'}$'+ unitTemp+ ']', muunnosKerroin = muunnosTemp, asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 
         for muuttujaTemp, nameTemp, unitTemp in [["vtke","Vertical integral of total TKE", "kg/s" ]]:
-            piirra_aikasarjasettii( muuttujaTemp, longName ='', ylabel = r'[$'+ unitTemp+ '$]', muunnosKerroin = 1., asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper  )
+            piirra_aikasarjasettii( muuttujaTemp, longName ='', ylabel = r'[$'+ unitTemp+ '$]', muunnosKerroin = 1., asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 

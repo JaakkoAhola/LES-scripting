@@ -17,13 +17,13 @@ def Muunnos(aika):
    TUNTI=(AIKA%DAY)//HOUR
    MINUUTTI=((AIKA%DAY)%HOUR)//MINUTE
    SEKUNTI=(((AIKA%DAY)%HOUR)%MINUTE)
-   
+
    PAIVA    = str(int(PAIVA))
    TUNTI    = str(int(TUNTI))
    MINUUTTI = str(int(MINUUTTI))
    SEKUNTI  = str(int(SEKUNTI))
-   
-   
+
+
   ###
   ### Muuta seuraavan rivin print komentoa, mikali kaytat python 2 -versiota
    return PAIVA + "d" + " " + TUNTI + "h" + " " + MINUUTTI + "m"+ " " + SEKUNTI + "s"
@@ -35,19 +35,44 @@ class Logger(object): # allows output to stdout and log file, by default to ${HO
 
     def write(self, message):
         self.terminal.write(message)
-        self.log.write(message)  
+        self.log.write(message)
 
     def flush(self):
         #this flush method is needed for python 3 compatibility.
         #this handles the flush command by doing nothing.
         #you might want to specify some extra behavior here.
-        pass  
+        pass
 
+class TooLongError(ValueError):
+    pass
+
+def pad(seq, target_length, padding=None):
+    """Extend the sequence seq with padding (default: None) so as to make
+    its length up to target_length. Return seq. If seq is already
+    longer than target_length, raise TooLongError.
+
+    >>> pad([], 5, 1)
+    [1, 1, 1, 1, 1]
+    >>> pad([1, 2, 3], 7)
+    [1, 2, 3, None, None, None, None]
+    >>> pad([1, 2, 3], 2)
+    ... # doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+      ...
+    TooLongError: sequence too long (3) for target length 2
+
+    """
+    length = len(seq)
+    if length > target_length:
+        raise TooLongError("sequence too long ({}) for target length {}"
+                           .format(length, target_length))
+    seq.extend([padding] * (target_length - length))
+    return seq
 
 def stringToBoolean(s, precise = False):
     r = False
     string = str(s)
-    
+
     if precise:
         if string == 'True':
             r = True
@@ -56,20 +81,20 @@ def stringToBoolean(s, precise = False):
             r = True
 
     return r
-    
+
 
 def waterBallMassToDiam(m):
     from math import pi
     from numpy import power
     diam = power( 6*m/(pi*1000.), (1./3.))*1e6
-    
+
     return diam # um
 
 def waterBallVolumeToDiam(V):
     from math import pi
     from numpy import power
     diam = power( 6*V/pi, (1./3.) )*1e6
-    
+
     return diam # um
 
 def myRound(x, base = 5):
