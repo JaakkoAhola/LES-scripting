@@ -106,16 +106,16 @@ def myRoundFloat(x, prec=2, base=.5):
 def giveValue( z,  z1, z2, V1, V2  ):
     return ( (z -z1)*(V2-V1) + (z2-z1)*V1 ) / (z2-z1)
 
-def degToDecim(deg,mins,secs):
+def degToDecim(deg,mins,secs, printing = False):
     decim = deg + mins/60. + secs/3600.
-    print(decim)
+    if printing: print(decim)
     return decim
 
-def decimToDeg(decim):
+def decimToDeg(decim, printing = False):
     deg  = int(decim)
     mins = int((decim-deg)*60.)
     secs = ((decim - deg)*60. - mins)*60.
-    print(str(deg) + '\u00B0' + ' ' + str(mins) + "'" + ' ' + str(round(secs,2)) + '"')
+    if printing: print(str(deg) + '\u00B0' + ' ' + str(mins) + "'" + ' ' + str(round(secs,2)) + '"')
     return deg, mins, secs
 
 def antiPodeInDecim( lat, lon ):

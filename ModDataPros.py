@@ -607,7 +607,7 @@ def rmse(predictions, targets):
 ### most useful with .ts.nc files       ###
 ###                                     ###
 ###########################################
-def aikasarjaTulostus( data, aika = 0, tulostus = False, piirra = False, uusikuva = True, nimi = 'aikasarja', xnimi = 'x-akseli', ynimi= 'y-akseli', changeColor=True, tightXAxis=False, LEGEND=True, omavari = False, label = None ):
+def aikasarjaTulostus( data, aika = 0, tulostus = False, piirra = False, uusikuva = True, nimi = 'aikasarja', xnimi = 'x-akseli', ynimi= 'y-akseli', changeColor=True, tightXAxis=False, LEGEND=True, omavari = False, label = None, gridi = True, loc = 3, bboxmode = "expand" ):
   #fig.aikasarjaTulostus = None
   #ax.aikasarjaTulostus  = None
 
@@ -628,7 +628,7 @@ def aikasarjaTulostus( data, aika = 0, tulostus = False, piirra = False, uusikuv
   #if uusikuva:
       #aikasarjaTulostus.fig, aikasarjaTulostus.ax = plot_alustus()
 
-  aikasarjaTulostus.fig, aikasarjaTulostus.ax, aikasarjaTulostus.legend = plottaa( aika, data, nimi, xnimi, ynimi, changeColor = changeColor, tightXAxis=tightXAxis, LEGEND=LEGEND, omavari = omavari, label = label, uusikuva = uusikuva )
+  aikasarjaTulostus.fig, aikasarjaTulostus.ax, aikasarjaTulostus.legend = plottaa( aika, data, nimi, xnimi, ynimi, changeColor = changeColor, tightXAxis=tightXAxis, LEGEND=LEGEND, omavari = omavari, label = label, uusikuva = uusikuva, gridi = gridi, loc = loc, bboxmode = bboxmode )
 
   return aikasarjaTulostus.fig, aikasarjaTulostus.ax, aikasarjaTulostus.legend
 
@@ -769,9 +769,11 @@ class colorPool:
                     colorList = sns.color_palette( snsColorPalette, colorNumber )
 
         if shuffling:
-            np.random.shuffle(colorList)
+            colorList = np.random.shuffle(colorList)
+
         self.currentColor = colorList[0]
         self.colors = cycle( colorList )
+        self.colorList = colorList
 
     def getCurrentColor(self):
         return self.currentColor
@@ -779,6 +781,9 @@ class colorPool:
     def getNextColor(self):
         self.currentColor = next(self.colors)
         return self.currentColor
+
+    def getList(self):
+        return self.colorList
 
 ########################################
 ### colorPool object                 ###
@@ -788,11 +793,11 @@ class colorPool:
 
 def initializeColors(colorNRO=6, colorList = None, shuffling = False, useSnsColor = False, blindnesslevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, snsColorPalette = "bright", colorMap = plt.cm.gist_ncar):
 
-  global colorChoice
+  #global colorChoice
 
-  colorChoice = colorPool( colorNumber = colorNRO, colorList = colorList, shuffling = shuffling, useSnsColor = useSnsColor, blindnesslevel = blindnesslevel, useWhite = useWhite, useBlack = useBlack, useBeige = useBeige, useLavender = useLavender, snsColorPalette = snsColorPalette, colorMap = colorMap)
+  colorObject = colorPool( colorNumber = colorNRO, colorList = colorList, shuffling = shuffling, useSnsColor = useSnsColor, blindnesslevel = blindnesslevel, useWhite = useWhite, useBlack = useBlack, useBeige = useBeige, useLavender = useLavender, snsColorPalette = snsColorPalette, colorMap = colorMap)
 
-  return colorChoice
+  return colorObject.getList()
 
 ########################################
 ### add a vertical line              ###
@@ -894,7 +899,7 @@ def plot_setXlim( minimiX, maksimiX, extendBelowZero = True, A = 0.05 ):
 ### plot data                        ###
 ###                                  ###
 ########################################
-def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, currentColor = 'b', changeColor=True, tightXAxis=False, tightYAxis = False, markers=False, LEGEND=True, omavari = False, scatter=False, uusikuva = False, gridi = True, loc = 3, linestyle = '-', markersize = 10, marker = 'o', a = 70, b=42, sub_i = 1, sub_j = 1, sub_k = 1, uusifig = True, uusisub = True, figuuri = None, fontsizeCustom = False):
+def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, currentColor = 'b', changeColor=True, tightXAxis=False, tightYAxis = False, markers=False, LEGEND=True, omavari = False, scatter=False, uusikuva = False, gridi = True, loc = 3, linestyle = '-', markersize = 10, marker = 'o', a = 70, b=42, sub_i = 1, sub_j = 1, sub_k = 1, uusifig = True, uusisub = True, figuuri = None, fontsizeCustom = False, bboxmode =  "expand"):
 
 
   if uusikuva:
@@ -927,11 +932,12 @@ def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, current
   elif scatter:
       plt.scatter( x, y, color = currentColor, label=label, s=markersize**2, marker = marker)
 
-
+  # bbox_to_anchor=(x0,y0,width,height)
   if loc == 2: # right side
-      plottaa.legend = plt.legend(bbox_to_anchor=(1.02, 1), loc=loc, borderaxespad=0., fancybox = True, shadow = True )
+      plottaa.legend = plt.legend(bbox_to_anchor=(1.02 , 1.0, 0.2, 1), loc="lower left",
+                borderaxespad=0, mode='expand', frameon = False)# bbox_to_anchor=(1.02, 1, 0.2, 10), loc=loc, borderaxespad=0., fancybox = False, shadow = False )
   elif loc == 3: # top
-      plottaa.legend = plt.legend(bbox_to_anchor=(0., 1.06, 1., .102), loc=loc, ncol=6, fancybox = True, shadow = True , mode="expand" ) # upper center ,  prop={'size': 18}      bbox_to_anchor = ( 0., 1.1, 0.6, 20.102 ),loc=9,  ncol=2, mode="expand", borderaxespad=0., fancybox = True, shadow = True
+      plottaa.legend = plt.legend(bbox_to_anchor=(0., 1.06, 1., .102), loc=loc, ncol=6, fancybox = False, shadow = False, mode = bboxmode, frameon = False  ) # upper center ,  prop={'size': 18}      bbox_to_anchor = ( 0., 1.1, 0.6, 20.102 ),loc=9,  ncol=2, mode="expand", borderaxespad=0., fancybox = True, shadow = True
   for legobj in plottaa.legend.legendHandles:
       legobj.set_linewidth(8.0)
 
