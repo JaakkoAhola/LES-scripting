@@ -29,6 +29,7 @@ elif [[ $jobflag == 'SBATCH' ]]; then ## CSC's Sisu machine values
     export WTMAX=72:00:00 #maximum value of wall time for small_long
     export outputPostfix=.out
     export PATH="${USERAPPL}/miniconda2/bin:$PATH"
+    export projectID=2001635
 fi
 
 export salsa=${LES}/src/src_salsa

@@ -683,7 +683,7 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
             savePrefix = muuttuja
 
         if saveFig:
-            plt.savefig( picturefolder + savePrefix + saveTag + LVLprintSave + '.png', bbox_inches='tight', pad_inches=0.06)
+            plt.savefig( picturefolder + savePrefix + saveTag + LVLprintSave + '.png', bbox_inches='tight', pad_inches=0.07)
 
             if legenda:
                 legendfolder = picturefolder + "/" + "legends/"
@@ -1744,7 +1744,7 @@ def piirra_binijakauma( muuttuja, muunnosKerroin = 1.0, longName = None, savePre
 
 
 #######################
-def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, longName = None , savePrefix = None, useDN = False, useColorBar = True, colorBarOnly = False, colorBarTickTotalNumber = 10, colorBarTickValues = None, colorBarTickNames = None, colorBarTickValuesInteger = False,  xlabels = None, ylabels = None, xticks = None, yticks = None, variKartta = plt.cm.Blues, profiili = False, radCool = False, cloudBaseTop = False, spinup = None, testi = False, sliceXbeg = None, sliceXend = None, sliceYbeg = None, sliceYend = None, askChangeOfVariable = False, fontsizeCustom = False, legenda = True, hideColorBarLabels = None, showXlabel = True, showYlabel = True ):
+def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, longName = None , savePrefix = None, useDN = False, useColorBar = True, colorBarOnly = False, colorBarTickTotalNumber = 10, colorBarTickValues = None, colorBarTickNames = None, colorBarTickValuesInteger = False,  xlabels = None, ylabels = None, xticks = None, yticks = None, variKartta = plt.cm.Blues, profiili = False, radCool = False, cloudBaseTop = False, spinup = None, testi = False, sliceXbeg = None, sliceXend = None, sliceYbeg = None, sliceYend = None, askChangeOfVariable = False, fontsizeCustom = False, legenda = True, hideColorBarLabels = None, colorBarMainLabel = None, showXlabel = True, showYlabel = True ):
 
     from mpl_toolkits.axes_grid1 import make_axes_locatable
     from matplotlib import colors
@@ -1992,6 +1992,9 @@ def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, lo
                 colorBarTickNames = list(map( str, colorBarTickValues))
 
             cbar.ax.set_yticklabels(colorBarTickNames)  # vertically oriented colorbar
+            if colorBarMainLabel is not None:
+                cbar.ax.set_xlabel(colorBarMainLabel)
+
             if fontsizeCustom:
                 cbar.ax.tick_params(labelsize=36) #18
                 ax.title.set_fontsize(35)
@@ -2009,7 +2012,7 @@ def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, lo
             plt.ylabel('height [m]')
         if showXlabel:
             plt.xlabel('time [h]')
-        plt.tight_layout()
+
 
 
         if savePrefix is None:
@@ -3454,7 +3457,7 @@ if ICE:
             else:
                 legendalwp = False
                 loclwp = 3
-            piirra_aikasarjasettii( muuttuja = 'lwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel ="LWP " + r'$\mathbf{[ 10^{-3} {kg} / {m}^2 ]}$', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'lwp' + tagii + str(lwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendalwp, loc = loclwp, tallenna = tallennaCSV  )
+            piirra_aikasarjasettii( muuttuja = 'lwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel =r'$\mathbf{ {LWP}{\ } [ g {\ } {m}^{-2} ]}$', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'lwp' + tagii + str(lwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendalwp, loc = loclwp, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 
@@ -3463,7 +3466,7 @@ if ICE:
             WPticks = list(map(int, np.arange(0,iwpmax + .1,1)))
             WPlabels = list(map(str, WPticks))
 
-            piirra_aikasarjasettii( muuttuja = 'iwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel ="IWP " + r'$\mathbf{[ 10^{-3} {kg} / {m}^2]}$', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'iwp' + tagii + str(iwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3, legenda = legendaPaper, tallenna = tallennaCSV  )
+            piirra_aikasarjasettii( muuttuja = 'iwp_bar', muunnosKerroin = 1000.0, longName = '', ylabel =r'$\mathbf{ {IWP} {\ } [ g {\ } {m}^{-2} ]}$', ymin = 0.0, ymax=max(WPticks), extendBelowZero = False,  savePrefix = 'iwp' + tagii + str(iwpmax) + '_uclales-salsa', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 3, legenda = legendaPaper, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 
@@ -3472,18 +3475,21 @@ if ICE:
 
         mdp.plot_suljetus( not naytaPlotit)
 
-        piirra_aikasarjasettii( muuttuja = 'Nc_ic', muunnosKerroin = 1.e-6, longName = 'in-cloud CDNC', ylabel = r'$\mathbf{[ \#/10^{-6} \ {kg}]}$', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cdnc' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
+        piirra_aikasarjasettii( muuttuja = 'Nc_ic', muunnosKerroin = 1.e-6, longName = 'in-cloud CDNC', ylabel = r'$\mathbf{[ 10^{6} {kg}^{-1}]}$', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False,  savePrefix = 'cdnc' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
 
         mdp.plot_suljetus( not naytaPlotit)
 
         # Ice number concentration
-        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = '', ylabel = r'$\mathbf{N_i\ [ \#/10^{-3} {kg}]}$', asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
+        WPticks = np.arange(0, 4+0.1, 0.2)
+        WPlabels = [ "  " +str(int(i)) for i in WPticks ]
+        WPlabels[0] = "0"
+        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = '', ylabel = r'$\mathbf{ N_{i} {\ }[ 10^{3} {kg}^{-1}]}$', extendBelowZero = False, ymin = 0.0, ymax=max(WPticks),  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV  )
 
         mdp.plot_suljetus( not naytaPlotit)
 
         piirra_aikasarjasettii( muuttuja = 'wmax', longName = '', ylabel = '[m/s]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True, tallenna = tallennaCSV, loc = 3 )
 
-        piirra_aikasarjasettii( muuttuja = 'wmax', longName = 'Maximum vertical velocity', ylabel = '[m/s]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True, tallenna = tallennaCSV, loc = 2 )
+        piirra_aikasarjasettii( muuttuja = 'wmax', longName = 'Maximum vertical velocity', ylabel = r'$\mathbf{[m s^{-1}]}$', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True, tallenna = tallennaCSV, loc = 2 )
 
         mdp.plot_suljetus( not naytaPlotit)
 
@@ -3496,15 +3502,15 @@ if ICE:
 
         WPticks = np.arange(0,6.1,1)
         WPlabels = list(map(str, WPticks))
-        piirra_aikasarjasettii( muuttuja = 'rmH2Oic',     muunnosKerroin = 1.e6,  longName = '', ylabel = r'$\mathbf{{Prec}_{{srf}}\ [10^{-6} {kg} {m}^{-2} {s}^{-1}]}$', asetaRajat = RajausFlag, ymin = 0.0, ymax=WPticks[-1], extendBelowZero = False,  savePrefix = 'depIce', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 5, askChangeOfVariable = askChangeOfVariable, legenda = legendaPaper, tallenna = tallennaCSV )
+        piirra_aikasarjasettii( muuttuja = 'rmH2Oic',     muunnosKerroin = 1.e6,  longName = '', ylabel = r'$\mathbf{ Prec_{srf} {\ } [10^{-6} {kg}{\ }{m}^{-2}{\ }{s}^{-1}]}$', asetaRajat = RajausFlag, ymin = 0.0, ymax=WPticks[-1], extendBelowZero = False,  savePrefix = 'depIce', omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 5, askChangeOfVariable = askChangeOfVariable, legenda = legendaPaper, tallenna = tallennaCSV )
 
         mdp.plot_suljetus( not naytaPlotit)
 
-        for muuttujaTemp, nameTemp, unitTemp, muunnosTemp in [["rmDUdr","Deposition of dust with aerosols", r'$kg m^{-2} s^{-1}$', 1.e6],
-        ["rmDUic", "Deposition of DU with ice", r'$kg m^{-2} s^{-1}$', 1.e12],
-        ["rmDUcl", "Deposition of dust with of clouds", r'$kg m^{-2} s^{-1}$', 1.e6],
-        ["DU_ii", "Dust mass mixing ratio in ice", "kg/kg", 1.e12], ["DU_ic", "Cloud droplet DU mass mixing ratio", "kg/kg", 1.e12], ["DU_int", "DU mass mixing ratio in interstitial aerosols", "kg/kg", 1.e12 ]]:
-            piirra_aikasarjasettii( muuttujaTemp, longName =nameTemp, ylabel = r'[$10^{' + str(-int(np.log10(muunnosTemp)))+'}$'+ unitTemp+ ']', muunnosKerroin = muunnosTemp, asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
+        for muuttujaTemp, nameTemp, unitTemp, muunnosTemp in [["rmDUdr","Deposition of dust with aerosols", 'kg {\ } m^{-2} {\ } s^{-1}', 1.e6],
+        ["rmDUic", "Deposition of DU with ice", 'kg {\ } m^{-2} {\ } s^{-1}', 1.e12],
+        ["rmDUcl", "Deposition of dust with of clouds", 'kg {\ } m^{-2} {\ } s^{-1}', 1.e6],
+        ["DU_ii", "Dust mass mixing ratio in ice", "kg {\ } kg^{-1}", 1.e12], ["DU_ic", "Cloud droplet DU mass mixing ratio", "kg {\ } kg^{-1}", 1.e12], ["DU_int", "DU mass mixing ratio in interstitial aerosols", "kg {\ } kg^{-1}", 1.e12 ]]:
+            piirra_aikasarjasettii( muuttujaTemp, longName =nameTemp, ylabel = r'$\mathbf{ [10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']}$', muunnosKerroin = muunnosTemp, asetaRajat = RajausFlag, extendBelowZero = False, ymin = 0.0,  savePrefix = muuttujaTemp + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, legenda = legendaPaper, tallenna = tallennaCSV  )
 
             mdp.plot_suljetus( not naytaPlotit)
 
@@ -3553,35 +3559,35 @@ if ICE:
             #cbvalTStr       = list(map(str, xTicksSeconds))
             for temp in 'thl', 't':
                 try:
-                    piirra_profiiliKehitys( temp,  variKartta = aika_color, longName =  'Potential temperature', xlabel = r'$\theta$' + ' [K]', ylabel = 'z [m]', savePrefix = 'evol01_theta', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True, xTikit = range(263, 273), xmin = 263., xmax = 273.5, viivaTyyli = listOfLineStyles )
+                    piirra_profiiliKehitys( temp,  variKartta = aika_color, longName =  'Potential temperature', xlabel = r'$ \mathbf{\theta {\ } [K]}$', ylabel = 'z [m]', savePrefix = 'evol01_theta', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True, xTikit = range(263, 273), xmin = 263., xmax = 273.5, viivaTyyli = listOfLineStyles )
                     mdp.plot_suljetus( not naytaPlotit)
                 except KeyError:
                     print("piirra_profiiliKehitys did not succeed with", temp)
             muunnosTemp = 1e6
             unitTemp = "\mathbf{kg/kg}"
-            piirra_profiiliKehitys( 'P_cH2Oi', muunnosKerroin = muunnosTemp, variKartta = aika_color, longName =  'SALSA total mass mixing ratio of H2O in ice', xlabel = r'$[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']$', ylabel = 'z [m]', savePrefix = 'evol02_cH2Oi', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_cH2Oi', muunnosKerroin = muunnosTemp, variKartta = aika_color, longName =  'SALSA total mass mixing ratio of H2O in ice', xlabel = r'$\mathbf{[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']}$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol02_cH2Oi', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
 
-            piirra_profiiliKehitys( 'P_ri', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'Ice water mixing ratio', xlabel = r'$[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']$', ylabel = 'z [m]', savePrefix = 'evol03_P_ri', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_ri', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'Ice water mixing ratio', xlabel = r'$\mathbf{[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']}$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol03_P_ri', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
-            piirra_profiiliKehitys( 'P_rl', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'Cloud water mixing ratio', xlabel = r'$[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']$', ylabel = 'z [m]', savePrefix = 'evol04_P_rl', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_rl', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'Cloud water mixing ratio', xlabel = r'$\mathbf{[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']}$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol04_P_rl', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
 
-            piirra_profiiliKehitys( 'P_Nia',  variKartta = aika_color, longName =  'SALSA ice number concentration in regime A', xlabel = r'$[\#/kg]$', ylabel = 'z [m]', savePrefix = 'evol05_P_Nia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_Nia',  variKartta = aika_color, longName =  'SALSA ice number concentration in regime A', xlabel = r'$\mathbf{[kg^{-1}]}$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol05_P_Nia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
-            piirra_profiiliKehitys( 'P_Nib',  variKartta = aika_color, longName =  'SALSA ice number concentration in regime B', xlabel = r'$[\#/kg]$', ylabel = 'z [m]', savePrefix = 'evol06_P_Nib', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_Nib',  variKartta = aika_color, longName =  'SALSA ice number concentration in regime B', xlabel = r'$\mathbf{[kg^{-1}]}$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol06_P_Nib', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
             muunnosTemp = 1e6
-            unitTemp = "\mathbf{m}"
-            piirra_profiiliKehitys( 'P_Rwia', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'SALSA mean ice radius, regime A', xlabel = r'$[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']$', ylabel = 'z [m]', savePrefix = 'evol07_P_Rwia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            unitTemp = "m"
+            piirra_profiiliKehitys( 'P_Rwia', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'SALSA mean ice radius, regime A', xlabel = r'$\mathbf{[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']}$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol07_P_Rwia', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
-            piirra_profiiliKehitys( 'P_Rwib', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'SALSA mean ice radius, regime B', xlabel = r'$[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']$', ylabel = 'z [m]', savePrefix = 'evol08_P_Rwib', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
+            piirra_profiiliKehitys( 'P_Rwib', muunnosKerroin = muunnosTemp,  variKartta = aika_color, longName =  'SALSA mean ice radius, regime B', xlabel = r'$[10^{' + str(-int(np.log10(muunnosTemp)))+'}'+ unitTemp+ ']$', ylabel = r'$\mathbf{{height} {\ } [m]}$', savePrefix = 'evol08_P_Rwib', aikaPisteet = aikaPisteet, asetaRajat = False, useSnsColor = True,  viivaTyyli = listOfLineStyles )
             mdp.plot_suljetus( not naytaPlotit)
 
             mpl.rcParams['figure.figsize'] = origFig
@@ -3591,33 +3597,35 @@ if ICE:
         cbvalICEStr = ['%.1f' % elem for elem in cbvalICE ]
         if domainP:
 
-            piirra_domainProfiili( 'w_2', longName = "Vertical velocity squared " + r'$\mathbf{[ {m}^{2} / {s}^{2}]}$', useDN = False, transpose = True, colorBarTickValues = cbvalICE, colorBarTickNames = cbvalICEStr, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = mdp.scientific_colormaps("turku", reverse = True), profiili = True, spinup = spinup )
+            piirra_domainProfiili( 'w_2', longName = "Vertical velocity squared " + r'$\mathbf{[ {m}^{2} {\ }{s}^{-2}]}$', useDN = False, transpose = True, colorBarTickValues = cbvalICE, colorBarTickNames = cbvalICEStr, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = mdp.scientific_colormaps("turku", reverse = True), profiili = True, spinup = spinup )
 
             mdp.plot_suljetus( not naytaPlotit)
 
-# ["P_DUib", "Mass mixing ratio of dust in ice", "kg/kg"],
+# ["P_DUib", "Mass mixing ratio of dust in ice", r"${kg{\ }kg^{-1}}$"],
 # ["P_Naba", "Aerosol number concentration in size bins A", "#/kg"],
 # ["P_Nabb", "Aerosol number concentration in size bins B", "#/kg"],
-# ["P_DUab", "Mass mixing ratio of dust in aerosol bins B","kg/kg"],
+# ["P_DUab", "Mass mixing ratio of dust in aerosol bins B",r"${kg{\ }kg^{-1}}$"],
             colorBarTickTotalNumber = 13
-            for muuttujaTemp, nameTemp, unitTemp in [["P_cDUi", "Total mass mixing ratio of dust in ice","kg/kg"],
-            ["P_cDUa", "Total mass mixing ratio of dust in aerosols","kg/kg"], ["P_cDUc", "Total mass mixing ratio of dust in cloud droplets","kg/kg"]]:
+            for muuttujaTemp, nameTemp, unitTemp in [["P_cDUi", "Total mass mixing ratio of dust in ice","{kg{\ }kg^{-1}}"],
+            ["P_cDUa", "Total mass mixing ratio of dust in aerosols",r"{kg{\ }kg^{-1}}"], ["P_cDUc", "Total mass mixing ratio of dust in cloud droplets",r"{kg{\ }kg^{-1}}"]]:
                 if muuttujaTemp == "P_cDUa":
                     useColorBar = True
                     colorBarOnly = True
                     showXlabel = False
-
+                    colorBarMainLabel = r'$\mathbf{[10^{-12}' + unitTemp +"]}$"
                 elif muuttujaTemp == "P_cDUc":
                     useColorBar = False
                     colorBarOnly = False
                     showXlabel = True
+                    colorBarMainLabel = None
 
                 elif muuttujaTemp == "P_cDUi":
                     useColorBar = False
                     colorBarOnly = False
                     showXlabel = True
+                    colorBarMainLabel = None
 
-                piirra_domainProfiili( muuttujaTemp, longName="", muunnosKerroin = 1.e12,  useDN = False, transpose = True, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = sns.color_palette("Reds", colorBarTickTotalNumber), profiili = True, spinup = spinup, colorBarTickValues = range(0,13+1), useColorBar = useColorBar, legenda = legendaPaper, hideColorBarLabels = 2, showXlabel = showXlabel, colorBarOnly = colorBarOnly ) #longName =nameTemp + " " + r'$[10^{-12}$' + unitTemp +"]"
+                piirra_domainProfiili( muuttujaTemp, longName="", muunnosKerroin = 1.e12,  useDN = False, transpose = True, xlabels = xLabelsHours, ylabels = ylabels, xticks = ticksHours, yticks = korkeustikit,  variKartta = sns.color_palette("Reds", colorBarTickTotalNumber), profiili = True, spinup = spinup, colorBarTickValues = range(0,13+1), useColorBar = useColorBar, legenda = legendaPaper, hideColorBarLabels = 2, showXlabel = showXlabel, colorBarOnly = colorBarOnly, colorBarMainLabel = colorBarMainLabel ) #longName =nameTemp + " " + r'$[10^{-12}$' + unitTemp +"]"
 
                 mdp.plot_suljetus( not naytaPlotit)
 

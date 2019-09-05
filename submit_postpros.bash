@@ -12,7 +12,7 @@
 set -e
 # echo eka $1 toka $2 kolmas $3 neljas $4
 
-# import subroutines & variables 
+# import subroutines & variables
 if [[ -d ${SCRIPT} ]]; then
    scriptref=${SCRIPT}
 else
@@ -173,6 +173,7 @@ cat > ${dir}/runpostpros${postfix}.sh <<FINALSBATCH
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=${email}
 #SBATCH -p serial
+#SBATCH --account=project_${projectID}
 
 source /etc/profile
 cd ${dir}

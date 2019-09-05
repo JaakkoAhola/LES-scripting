@@ -27,28 +27,28 @@ def radiationSounding(nmlbaseDict, radiationinputD, outputD):
     # radiationD: subfolder of radiation souding file
     # radoutputD: absolute path of radiation soudinng file in output folder
     # radB: if radiation sounding is used
-    # 
-    # 
-    
-    
+    #
+    #
+
+
     try:
         radiationP = nmlbaseDict[model_nml]["radsounding"]
         radiationV = vmD.join([radiationinputD, radiationP])
-        
+
         radiationD = os.path.dirname(radiationP)
         radoutputD = vmD.join( [outputD, radiationD] )
-        
+
         radB = True
-        
+
     except KeyError:
         radiationP = ""
         radiationV = ""
-        
-        radiationD = ""        
+
+        radiationD = ""
         radoutputD = ""
-        
+
         radB = False
-        
+
         pass
 
     return radiationP, radiationV, radiationD, radoutputD, radB
@@ -58,7 +58,7 @@ def makeDirectories(outputD, radB = False, radoutputD = "datafiles" ):
 
     if radB:
         makedirsL.append(radoutputD)
-        
+
     call(makedirsL)
 
 def writeNamelist(nmlbaseDict, outputD, override = True, printtaa=True):
@@ -82,13 +82,13 @@ def writeNamelist(nmlbaseDict, outputD, override = True, printtaa=True):
                 nmlbaseDict.write( namelistNewV )
         except OSError:
             print("The creation of new namelist did not succeed")
-            
+
 def writePatchNamelist(nmlbaseDict, nmlPatch, outputD, override = True):
     # input:
     #
     # nmlbaseDict: dictionary variable that is the namelisti
     # nmlPatch: patch to the namelist
-    # outputD: output directory   
+    # outputD: output directory
 
         namelistNewV = vmD.join([outputD,"NAMELIST" ])
         if os.path.isfile(namelistNewV) and override:
@@ -103,7 +103,7 @@ def copyFiles(exeV, soundinV, outputD, radB=False, radiationV = "", radiationP="
     # radB: if radiation sounding is needed
     # radiationV: absolute path of radiation sounding in inputfolder
     # radiationP: relative path of radiation sounding in outputfolder = same as value in namelist
-    
+
     copy2(exeV, outputD)
     copy2(soundinV, vmD.join([outputD,"sound_in"]))
 

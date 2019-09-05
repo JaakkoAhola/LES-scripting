@@ -16,7 +16,7 @@
 # $1 = name of output directory
 # $2 = number of processors
 # $3 = job flag of the job scheduling system (OPTIONAL) default value: PBS
-# 
+#
 # it is recommended to give input folder value:
 # e.g. exe=les.mpi input=/home/users/aholaj/UCLALES-SALSA/bin/case_emulator/emul01 ./submit_uclales-salsa.bash simulaatioKansio 64
 #
@@ -48,7 +48,7 @@ submit=${submit:-true}
 #################################
 ###			                  ###
 ### folders		              ###
-###         			      ### 
+###         			      ###
 #################################
 
 input=${input:-}
@@ -119,15 +119,15 @@ if [ $clean == true ]; then
     fi
         mkdir -p ${rundir} ${datadir}
 
-fi    
+fi
 
 
 # copy executables and input files to running directory
 if [ $COPY == 'true' ]; then
-    
+
     cp ${bin}/${exe} ${rundir}/
     cp ${bin}/datafiles/* ${datadir}/
-    
+
     cp ${input}/sound_in ${rundir}/
     cp ${input}/NAMELIST ${rundir}/
 fi
@@ -142,7 +142,7 @@ modifyoutput=${modifyoutput:-true}
 modifyoutputHistory=${modifyoutputHistory:-${modifyoutput}}
 
 if [ $modifyoutput == 'true' ]; then
-    sed -i "/filprf\s\{0,\}=\s\{0,\}/c\  filprf  = '"$outputname"'" ${rundir}/NAMELIST    
+    sed -i "/filprf\s\{0,\}=\s\{0,\}/c\  filprf  = '"$outputname"'" ${rundir}/NAMELIST
 fi
 
 if [ $modifyoutputHistory == 'true' ]; then
@@ -160,7 +160,7 @@ if [[ -n $ownjobname ]]; then
     apuNimi=$ownjobname
 else
     apuNimi=$outputname
-fi    
+fi
 length=$(( ${#apuNimi} < 7 ? ${#apuNimi} : 7))
 jobname=LES${apuNimi:$((${#apuNimi}-${length})):${length}}
 echo 'Queuing system jobname' $jobname
@@ -200,7 +200,7 @@ elif [ $jobflag == 'SBATCH' ] ; then
     if [[ $nproc -gt 1 ]]; then
         QUEUE=parallel
     else
-        QUEUE=serial    
+        QUEUE=serial
     fi
 
 
@@ -214,8 +214,9 @@ cat > ${rundir}/runles.sh <<FINALSBATCH
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=${email}
 #SBATCH -p ${QUEUE}
+#SBATCH --account=project_${projectID}
 
-#export I_MPI_PLATFORM=auto  
+#export I_MPI_PLATFORM=auto
 #export MPICH_ALLTOALLV_THROTTLE=2
 
 export MPICH_ENV_DISPLAY=1

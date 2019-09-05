@@ -3,7 +3,7 @@
 # Exit on error
 set -e
 shopt -s extglob
-# import subroutines & variables 
+# import subroutines & variables
 if [[ -d ${SCRIPT} ]]; then
    scriptref=${SCRIPT}
 else
@@ -39,7 +39,7 @@ curdir=${PWD}
 
 if [ -z "$B" ] && [ -z "$list" ]; then # generate list of cases automatically
     automatic="true"
-    
+
     echo "generate list of cases automatically"
 else
     automatic="false"
@@ -56,9 +56,9 @@ if [[ $automatic == "true" ]]; then
         echo "Checkout to the same git branch as the training set should be"
         exit 1
     fi
-    
+
     source activate py36
-    
+
     DESIGNnetcdffile=${IBRIX}/DESIGNnetcdf/${designfilu}/design_${designfilu}.nc
     B=$(python -c "from netCDF4 import Dataset; ff='$DESIGNnetcdffile'; nc = Dataset(ff, 'r'); print(nc.dimensions['case'].size)")
 
@@ -136,12 +136,12 @@ emulatoroutputroot=${outputroot}/${emulatorname}
 
 if [[ $restart == 'false' ]]; then
     echo 'poista vanhat kansiot' $folder
-    rm -rf  ${emulatoroutputroot} 
+    rm -rf  ${emulatoroutputroot}
 fi
 
 if [[ ! -d ${emulatoroutputroot} ]]; then
     restart='false'
-    echo ' ' 
+    echo ' '
     echo  "if emulatoroutputroot folder doesn't exist then restart value is always false"
     echo "restart -> $restart"
 fi
@@ -210,7 +210,7 @@ do
     	echo "statuksen tarkistus" emul${i} $status
     	LS=${status:0:1}
     	PPS=${status:1:2}
-    	
+
     	if [[ $status == '11' ]]
     	then
         	echo emul${i} "on VALMIS"
@@ -221,7 +221,7 @@ do
             statusKesken=$((statusKesken+1))
     	fi
 
- 
+
 
         echo emul${i} "poistetaan turhat statuksen mukaan"
         poistaturhat ${emulatorname}/emul${i} emul${i}
@@ -233,10 +233,10 @@ do
         cp ${inputrootfolder}/emul${i}/* ${emulatoroutputroot}/emul${i}/
         cp ${bin}/${exe} ${emulatoroutputroot}/emul${i}/
         cp ${bin}/datafiles/* ${emulatoroutputroot}/emul${i}/datafiles
-        
+
     fi
-    
-    
+
+
 done
 
 echo 'valmiit' $statusValmiit
@@ -283,6 +283,7 @@ cat > ${emulatoroutputroot}/control_multiple_emulator_run.sh <<FINALSBATCH
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=${email}
 #SBATCH -p longrun
+#SBATCH --account=project_${projectID}
 
 cd ${emulatoroutputroot}
 
