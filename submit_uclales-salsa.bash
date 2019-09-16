@@ -205,8 +205,10 @@ elif [ $jobflag == 'SBATCH' ] ; then
 
 
 cat > ${rundir}/runles.sh <<FINALSBATCH
-#!/bin/sh
-#SBATCH -J ${jobname}
+#!/bin/bash
+#SBATCH --job-name ${jobname}
+#SBATCH --account=project_${projectID}
+#SBATCH --partition=fmi
 #SBATCH -n ${nproc}
 #SBATCH -t ${WT}
 #SBATCH --output=LES_${outputname}-%j.out
@@ -214,7 +216,7 @@ cat > ${rundir}/runles.sh <<FINALSBATCH
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=${email}
 #SBATCH -p ${QUEUE}
-#SBATCH --account=project_${projectID}
+
 
 #export I_MPI_PLATFORM=auto
 #export MPICH_ALLTOALLV_THROTTLE=2

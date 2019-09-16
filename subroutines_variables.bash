@@ -23,13 +23,12 @@ if [[ $jobflag == 'PBS' ]]; then
     export WTMAX=24:00:00
 
 elif [[ $jobflag == 'SBATCH' ]]; then ## CSC's Sisu machine values
-    export outputroot=/wrk/${USER}/${model}
+    export outputroot=${WRKDIR}/${model}
     export nodeNPU=24 # number of processing units in a node
     export submitCMD=sbatch
     export WTMAX=72:00:00 #maximum value of wall time for small_long
     export outputPostfix=.out
-    export PATH="${USERAPPL}/miniconda2/bin:$PATH"
-    export projectID=2001635
+    export PATH="${HOME}/miniconda3/bin:$PATH"
 fi
 
 export salsa=${LES}/src/src_salsa
