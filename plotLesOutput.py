@@ -406,7 +406,7 @@ def shiftedColorMap(cmap, start=0, midpoint=0.5, stop=1.0, name='shiftedcmap'):
     return newcmap
 
 ##########################
-def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, variKartta = plt.cm.gist_rainbow, variRefVektori = jarjestys, colorBar = None, colorBarTickValues = [0,1], colorBarTickNames = ['0','1'], muunnosKerroin = 1.0, longName = 'titteli', xlabel = 'time [h]', ylabel='ylabel', extendBelowZero = True, asetaRajat = True, ymin = None, ymax = None, relative = False, savePrefix = None, omaVari = True, tit = '', nollaArvo = None, xlabels = None, ylabels = None, xticks = None, yticks = None, spinup = None, ylabelFont = None, askChangeOfVariable = False, piilotaOsaXlabel = False, legenda = True, profiili = False, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 3, piilotaOsaXlabelParam =4, NCtiedosto= False, tallenna = False, loc = 3 ):
+def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, variKartta = plt.cm.gist_rainbow, variRefVektori = jarjestys, colorBar = None, colorBarTickValues = [0,1], colorBarTickNames = ['0','1'], muunnosKerroin = 1.0, longName = 'titteli', xlabel = 'time [h]', ylabel='ylabel', extendBelowZero = True, asetaRajat = True, ymin = None, ymax = None, relative = False, savePrefix = None, omaVari = True, tit = '', nollaArvo = None, xlabels = None, ylabels = None, xticks = None, yticks = None, spinup = None, ylabelFont = None, askChangeOfVariable = False, piilotaOsaXlabel = False, legenda = True, profiili = False, piilotaOsaYlabel = False, piilotaOsaYlabelParam = 3, piilotaOsaXlabelParam =4, NCtiedosto= False, tallenna = False, loc = 3, conversionWithAirdensity = False, verticalLineList = None ):
     origmuuttuja = muuttuja
     plottausOnnistuu = False
     maksimi = None
@@ -474,6 +474,13 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
             plottausOnnistuu = True
         except KeyError:
             if debug: print("KeyError, variable " + muuttuja + " doesn't exist in " + tiedostonimi[i] )
+            continue
+
+        try:
+            if conversionWithAirdensity:
+                muuttuja_Tdata = muuttuja_Tdata * mdp.read_Data( filenamePS[i], "dn0" )[0]
+        except KeyError:
+            if debug: print("KeyError, conversion with dn0 did not succeeded")
             continue
 
         if muuttuja2 is not None:
@@ -663,6 +670,15 @@ def piirra_aikasarjasettii( muuttuja, muuttuja2 = None, muunnosKerroin2 = 1.0, v
 
         if spinup is not None:
             mdp.plot_vertical( spinup )
+
+        if verticalLineList is not None:
+            for verticalLine in verticalLineList:
+                mdp.plot_vertical( verticalLine )
+
+        if max(time_dataLongest) > 45*3600: #kuvatinter48h
+            mdp.plot_vertical( 24*3600 )
+        elif max(time_dataLongest) > 23*3600: #kuvatsens
+            mdp.plot_vertical( 8*3600 )
 
         if colorBar is not None and ( omaVari == True):
            cb = plt.colorbar( colorBar, shrink=.9, pad=.03, aspect=10, ticks = colorBarTickValues )#colorBar
@@ -3480,10 +3496,10 @@ if ICE:
         mdp.plot_suljetus( not naytaPlotit)
 
         # Ice number concentration
-        WPticks = np.arange(0, 4+0.1, 0.2)
+        WPticks = np.arange(0, 5+0.1, 0.2)
         WPlabels = [ "  " +str(int(i)) for i in WPticks ]
         WPlabels[0] = "0"
-        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = '', ylabel = r'$\mathbf{ N_{i} {\ }[ 10^{3} {kg}^{-1}]}$', extendBelowZero = False, ymin = 0.0, ymax=max(WPticks),  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV  )
+        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = '', ylabel = r'$\mathbf{ N_{i} {\ }[{L}^{-1}]}$', conversionWithAirdensity = True, extendBelowZero = False, ymin = 0.0, ymax=max(WPticks),  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV  )
 
         mdp.plot_suljetus( not naytaPlotit)
 
