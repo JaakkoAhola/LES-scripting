@@ -3499,8 +3499,9 @@ if ICE:
         WPticks = np.arange(0, 5+0.1, 0.2)
         WPlabels = [ "  " +str(int(i)) for i in WPticks ]
         WPlabels[0] = "0"
-        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = '', ylabel = r'$\mathbf{ N_{i} {\ }[{L}^{-1}]}$', conversionWithAirdensity = True, extendBelowZero = False, ymin = 0.0, ymax=max(WPticks),  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV  )
+        piirra_aikasarjasettii( muuttuja = 'Ni_ii', muunnosKerroin = 1.e-3, longName = '', ylabel = r'$\mathbf{ N_{i} {\ }[{g}^{-1}]}$', extendBelowZero = False, ymin = 0.0, ymax=max(WPticks),  savePrefix = 'Ni' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV  )
 
+        piirra_aikasarjasettii( muuttuja = 'Ni_ii_vol', muunnosKerroin = 1., longName = '', ylabel = r'$\mathbf{ N_{i} {\ }[{L}^{-1}]}$', extendBelowZero = False, ymin = 0.0, ymax=max(WPticks),  savePrefix = 'Ni_ii_vol' + tagii + '_uclales-salsa' , omaVari = False, xlabel = 'time [h]', yticks = WPticks, ylabels = WPlabels, spinup = spinup, piilotaOsaXlabel = piilotaOsaXlabel, piilotaOsaYlabel = True, piilotaOsaYlabelParam = 5, legenda = legendaPaper, tallenna = tallennaCSV, NCtiedosto = True  )
         mdp.plot_suljetus( not naytaPlotit)
 
         piirra_aikasarjasettii( muuttuja = 'wmax', longName = '', ylabel = '[m/s]', asetaRajat = RajausFlag, ymin = 0.0, extendBelowZero = False, savePrefix = 'w_max' + tagii + '_uclales-salsa' , omaVari = False, spinup = spinup, xlabel = 'time [h]', piilotaOsaXlabel = piilotaOsaXlabel, legenda = True, tallenna = tallennaCSV, loc = 3 )
@@ -3556,7 +3557,7 @@ if ICE:
             listOfLineStyles = [ (0, ()), (0, (5, 1)), (0, (3, 1, 1, 1)), (0, (3, 1, 1, 1, 1, 1)), (0, (1, 1)) ] #,  (0, (1, 5))
 
             interTime = np.argmin( np.abs( xTicksSeconds - xTicksSeconds[-1]/(len(listOfLineStyles)-1)))
-            aikaPisteet      = xTicksSeconds[::interTime] # even hours
+            aikaPisteet      = xTicksSeconds[::interTime] #
 
             print("aikaPisteet kehitys", aikaPisteet)
             kehitysvarit = [ "Greens_r", "Blues_r", "Reds_r"]
