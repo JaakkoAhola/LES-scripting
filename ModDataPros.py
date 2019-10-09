@@ -637,7 +637,7 @@ def aikasarjaTulostus( data, aika = 0, tulostus = False, piirra = False, uusikuv
 ### most useful with .ts.nc files       ###
 ###                                     ###
 ###########################################
-def profiiliTulostus( data, aikaPisteet = 0, korkeus=0,label = None, tulostus = False, piirra = False, uusikuva = True, nimi = 'profiili', xnimi = 'x-akseli', ynimi= 'y-akseli', changeColor=True, tightXAxis=False, tightYAxis=False, LEGEND=True, omavari = False, loc = 2, linestyle = '-'):
+def profiiliTulostus( data, aikaPisteet = 0, korkeus=0,label = None, tulostus = False, piirra = False, uusikuva = True, nimi = 'profiili', xnimi = 'x-akseli', ynimi= 'y-akseli', changeColor=True, tightXAxis=False, tightYAxis=False, LEGEND=True, omavari = False, loc = 2, linestyle = '-', gridi = True):
 
   if not isinstance(korkeus, np.ndarray):
     korkeus=np.arange( (np.shape(data)[0]) )
@@ -657,9 +657,9 @@ def profiiliTulostus( data, aikaPisteet = 0, korkeus=0,label = None, tulostus = 
 
   if isinstance( aikaPisteet, np.ndarray) or isinstance( aikaPisteet, list):
       for t in aikaPisteet:
-        profiiliTulostus.fig, profiiliTulostus.ax, profiiliTulostus.legend = plottaa( data[t,:], korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle )
+        profiiliTulostus.fig, profiiliTulostus.ax, profiiliTulostus.legend = plottaa( data[t,:], korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle, gridi = gridi )
   else:
-      profiiliTulostus.fig, profiiliTulostus.ax, profiiliTulostus.legend = plottaa( data, korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle )
+      profiiliTulostus.fig, profiiliTulostus.ax, profiiliTulostus.legend = plottaa( data, korkeus, nimi, xnimi, ynimi, label = label, changeColor = changeColor, tightXAxis=tightXAxis, tightYAxis=tightYAxis, LEGEND=LEGEND, omavari = omavari, loc = loc, linestyle = linestyle, gridi = gridi  )
 
 
   return profiiliTulostus.fig, profiiliTulostus.ax
@@ -926,15 +926,15 @@ def plottaa( x, y, tit = ' ', xl = ' ', yl = ' ', label=None, log=False, current
   if fontsizeCustom:
       markersize = None
   if markers and not scatter:
-      plt.plot( x, y, color = currentColor, label=label, linestyle=linestyle, marker=marker, markersize = markersize )
+      plt.plot( x, y, color = currentColor, label=label, linestyle=linestyle, marker=marker, markersize = markersize, zorder = 3 )
   elif not markers and not scatter:
-      plt.plot( x, y, color = currentColor, label=label, linestyle=linestyle) # default
+      plt.plot( x, y, color = currentColor, label=label, linestyle=linestyle, zorder = 3) # default
   elif scatter:
-      plt.scatter( x, y, color = currentColor, label=label, s=markersize**2, marker = marker)
+      plt.scatter( x, y, color = currentColor, label=label, s=markersize**2, marker = marker, zorder = 3)
 
   # bbox_to_anchor=(x0,y0,width,height)
   if loc == 2: # right side
-      plottaa.legend = plt.legend(bbox_to_anchor=(1.02 , 1.0, 0.2, 1), loc="lower left",
+      plottaa.legend = plt.legend(bbox_to_anchor=(1.02 , 2.0, 0.2, 100), loc="lower left",
                 borderaxespad=0, mode='expand', frameon = False)# bbox_to_anchor=(1.02, 1, 0.2, 10), loc=loc, borderaxespad=0., fancybox = False, shadow = False )
   elif loc == 3: # top
       plottaa.legend = plt.legend(bbox_to_anchor=(0., 1.06, 1., .102), loc=loc, ncol=6, fancybox = False, shadow = False, mode = bboxmode, frameon = False  ) # upper center ,  prop={'size': 18}      bbox_to_anchor = ( 0., 1.1, 0.6, 20.102 ),loc=9,  ncol=2, mode="expand", borderaxespad=0., fancybox = True, shadow = True
