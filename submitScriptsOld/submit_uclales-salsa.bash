@@ -228,7 +228,7 @@ set -e
 
 cd ${rundir}
 
-source ${scriptref}/taito_env_uclales-salsa.bash
+source ${scriptref}/puhti_env_uclales-salsa.bash
 
 srun ./${exe}
 

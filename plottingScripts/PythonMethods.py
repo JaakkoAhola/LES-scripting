@@ -6,6 +6,26 @@ Created on Fri Apr  7 16:28:50 2017
 """
 import sys
 import os
+import datetime
+
+class Logger(object): # allows output to stdout and log file, by default to ${HOME}/logger.txt file
+    def __init__(self, file = os.environ["HOME"] + "logger.txt" ):
+        self.terminal = sys.stdout
+        self.log = open(file, "w")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        #this flush method is needed for python 3 compatibility.
+        #this handles the flush command by doing nothing.
+        #you might want to specify some extra behavior here.
+        pass
+
+class TooLongError(ValueError):
+    pass
+
 
 def Muunnos(aika):
    AIKA=float(aika)
@@ -28,23 +48,8 @@ def Muunnos(aika):
   ### Muuta seuraavan rivin print komentoa, mikali kaytat python 2 -versiota
    return PAIVA + "d" + " " + TUNTI + "h" + " " + MINUUTTI + "m"+ " " + SEKUNTI + "s"
 
-class Logger(object): # allows output to stdout and log file, by default to ${HOME}/logger.txt file
-    def __init__(self, file = os.environ["HOME"] + "logger.txt" ):
-        self.terminal = sys.stdout
-        self.log = open(file, "w")
-
-    def write(self, message):
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        #this flush method is needed for python 3 compatibility.
-        #this handles the flush command by doing nothing.
-        #you might want to specify some extra behavior here.
-        pass
-
-class TooLongError(ValueError):
-    pass
+def date(format="%Y-%m-%d"):
+    return datetime.datetime.utcnow().strftime(format)
 
 def pad(seq, target_length, padding=None):
     """Extend the sequence seq with padding (default: None) so as to make

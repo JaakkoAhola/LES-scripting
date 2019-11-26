@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import time
-tic = time.clock()
+tic = time.time()
 import ModDataPros as mdp
 import sys
 from itertools import cycle
@@ -8,9 +8,9 @@ import numpy as np
 from scipy import interpolate
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-import matplotlib.colors as colors
 import seaborn as sns
 import os
+import pathlib
 import glob
 from netCDF4 import Dataset
 from PythonMethods import myRound
@@ -19,8 +19,16 @@ import PythonMethods as pm
 import xarray as xr
 import re
 import matplotlib.ticker as ticker
+sys.path.append('/home/aholaj/mounttauskansiot/puhtihome/script_tools/emulatorScripts')
+from emulator_inputs import absT
+sys.path.append("/home/aholaj/OneDrive/000_WORK/000_ARTIKKELIT/000-Manuscript-ICE/scripts")
+import contour
 
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import AdaBoostRegressor
+from math import ceil
 import pandas as pd
+
 global piirra, tulostus, tightXAxis, saveFig, picturefolder, LEGEND, tag, kylla, emuloo, setupFileHandler, readFromFile, debug
 
 ####################################################
@@ -1083,8 +1091,7 @@ def piirra_profiiliKehitys(  muuttuja, variKartta = plt.cm.gist_rainbow, colorBa
                            xlabels = None, ylabels = None, xticks = None, yticks = None,\
                            tempConversion = False, askChangeOfVariable = False,fontsizeCustom = False, viivaTyyli = None, \
                            plottaaKaikkiSamaan = False, useSnsColor = False, legenda = True, cloudEvol = True, excludeNeg = False, piilotaOsaYlabel = None ):
-    #import matplotlib.patches as mpatches
-    from emulator_inputs import absT
+    
     if aikaPisteet is None:
         sys.exit("You did not give any time points for profile evolution, exiting")
 
@@ -1701,7 +1708,7 @@ def piirra_binijakauma( muuttuja, muunnosKerroin = 1.0, longName = None, savePre
 #######################
 def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, longName = None , savePrefix = None, useDN = False, useColorBar = True, colorBarOnly = False, colorBarTickTotalNumber = 10, colorBarTickValues = None, colorBarTickNames = None, colorBarTickValuesInteger = False,  xlabels = None, ylabels = None, xticks = None, yticks = None, variKartta = plt.cm.Blues, profiili = False, radCool = False, cloudBaseTop = False, spinup = None, testi = False, sliceXbeg = None, sliceXend = None, sliceYbeg = None, sliceYend = None, askChangeOfVariable = False, fontsizeCustom = False, legenda = True, hideColorBarLabels = None, colorBarMainLabel = None, showXlabel = True, showYlabel = True ):
 
-    from matplotlib import colors
+    
 
     if spinup is None:
         sys.exit("EXIT anna spinup @ piirra_domainProfiili")
@@ -1835,9 +1842,9 @@ def piirra_domainProfiili( muuttuja, muunnosKerroin = 1.0, transpose = False, lo
         #print 'colorbartickvalues', colorBarTickValues
         if isinstance( variKartta, list):
             variKartta[0] = "#FFFFFF"
-            variKartta   = colors.ListedColormap(variKartta)
+            variKartta   = mpl.colors.ListedColormap(variKartta)
             bounds = colorBarTickValues
-            norm   = colors.BoundaryNorm(bounds, variKartta.N)
+            norm   = mpl.colors.BoundaryNorm(bounds, variKartta.N)
         print("piirra_domainProfiili max value",muuttuja, np.max(muuttuja_meanProfile), "shape", np.shape(muuttuja_meanProfile))
 
         cax = ax.imshow( muuttuja_meanProfile, interpolation='nearest', cmap=variKartta, vmin= min(colorBarTickValues), vmax=max(colorBarTickValues), extent=[0, np.shape(muuttuja_meanProfile)[1], 0, np.shape(muuttuja_meanProfile)[0] ],  aspect='auto', norm = norm ) #
@@ -2092,9 +2099,9 @@ def piirra_domainprofiiliHeatMap( muuttuja, muunnosKerroin = 1.0, longName = Non
         #print 'colorbartickvalues', colorBarTickValues
         if isinstance( variKartta, list):
             variKartta[0] = "#FFFFFF"
-            variKartta   = colors.ListedColormap(variKartta)
+            variKartta   = mpl.colors.ListedColormap(variKartta)
             bounds = colorBarTickValues
-            norm   = colors.BoundaryNorm(bounds, variKartta.N)
+            norm   = mpl.colors.BoundaryNorm(bounds, variKartta.N)
         if debug: print("piirra_domainProfiili max value",muuttuja, np.max(muuttuja_data), "shape", np.shape(muuttuja_data))
         
         fig, ax0 = mdp.plot_alustus()
@@ -2237,9 +2244,6 @@ def piirra_domainprofiiliHeatMap( muuttuja, muunnosKerroin = 1.0, longName = Non
 
 ###################################################################
 def piirra_kokojakauma( muuttujaR = 'S_Rwiba', muuttujaN = 'S_Niba', typename = 'Ice', muunnosKerroinR = 2.e3, korkeusH = None, aikaT = None, xlabel = 'Diameter [mm]', ylabel=r'\#', asetaRajat = True, xmax = None, ymax = None, savePrefix = None, legenda = True, interplo = True, sekoita = True, xCustSize = None, yCustSize = None, askChangeOfVariable = False, fontsizeCustom = False):
-    from sklearn.tree import DecisionTreeRegressor
-    from sklearn.ensemble import AdaBoostRegressor
-    from math import ceil
 
     if korkeusH is None:
         korkeusH = int(input("Anna z [m]: "))
@@ -2562,8 +2566,6 @@ def piirra_domainMeanProfiili( muuttuja, muuttujaPainotus =  'S_Niba', muuttujaP
         if profiili:
             dataSlizeMean = dataSlize
         elif binidata:
-            #from math import pi
-            #rho = 44.2*6./pi
             painotus =  np.multiply( mdp.read_Data( tiedostonimi[i], muuttujaPainotus), np.multiply( np.power(mdp.read_Data( tiedostonimi[i], muuttujaPainotusPotenssi ),3), dn0*44.2) )
             painotusSlize = painotus[ Tslize, :, :, :, : ]
             if len(Tslize)>1:
@@ -3149,6 +3151,24 @@ if ICE:
         legendaPaper= False
         kehitys = True
         tallennaCSV = True
+        
+        for ind,tiedosto in enumerate(tiedostolista):
+            datakansio = pathlib.Path(tiedosto).parent
+            contour.jakaumafraktioaikasarja(folder = datakansio, mode = "inCloud", limit = 1e-6, packing = 3, timeEndH= 33.05,
+                                                kuvakansio = picturefolder, kuvakansioPDF = picturefolder, filenamePDF = "figureFrac",
+                                                figurePrefix = labelArray[ind] + "_",
+                                                useLegend = False)
+            
+            profColormap = sns.color_palette(palette="viridis")
+            profColormap[0]="white"
+            #Mass mixing ratio of dust in ice
+            for mm in ["P_cDUa", "P_cDUc", "P_cDUi"]:
+                contour.prof(mm, title = "",\
+                         folder = datakansio,\
+                         figurePrefix = labelArray[ind]+ "_",
+                         kuvakansio = picturefolder, colors = profColormap)
+            
+
 
         for lwpmax in [50,60,100]:
             WPticks =  list(map(int, np.arange(0, lwpmax + .1 ,2)))
@@ -3349,7 +3369,7 @@ if ICE:
                     mdp.plot_suljetus( not naytaPlotit)
 
 
-toc = time.clock()
+toc = time.time()
 print(round(toc - tic, 2), "seconds of execution")
 ########################
 ### finishing up     ###

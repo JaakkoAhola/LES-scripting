@@ -9,9 +9,8 @@ import os
 import json
 from subprocess import call
 from shutil import copy2
-global vmD, model_nml
+global model_nml
 import f90nml as nml
-vmD = "/"
 model_nml = "model"
 
 def radiationSounding(nmlbaseDict, radiationinputD, outputD):
@@ -33,10 +32,10 @@ def radiationSounding(nmlbaseDict, radiationinputD, outputD):
 
     try:
         radiationP = nmlbaseDict[model_nml]["radsounding"]
-        radiationV = vmD.join([radiationinputD, radiationP])
+        radiationV = os.path.join(radiationinputD, radiationP)
 
-        radiationD = os.path.dirname(radiationP)
-        radoutputD = vmD.join( [outputD, radiationD] )
+        radiationD = os.path.dirname( radiationP )
+        radoutputD = os.path.join( outputD, radiationD )
 
         radB = True
 
@@ -72,7 +71,7 @@ def writeNamelist(nmlbaseDict, outputD, override = True, printtaa=True):
     if printtaa:
         print(json.dumps( nmlbaseDict, separators = (",", "=")) )
 
-    namelistNewV = vmD.join([outputD,"NAMELIST" ])
+    namelistNewV = os.path.join( outputD,"NAMELIST" )
     try:
         nmlbaseDict.write( namelistNewV )
     except OSError:
@@ -90,7 +89,7 @@ def writePatchNamelist(nmlbaseDict, nmlPatch, outputD, override = True):
     # nmlPatch: patch to the namelist
     # outputD: output directory
 
-        namelistNewV = vmD.join([outputD,"NAMELIST" ])
+        namelistNewV = os.path.join( outputD,"NAMELIST" )
         if os.path.isfile(namelistNewV) and override:
             nml.patch( nmlbaseDict, nmlPatch, namelistNewV )
 
@@ -105,12 +104,20 @@ def copyFiles(exeV, soundinV, outputD, radB=False, radiationV = "", radiationP="
     # radiationP: relative path of radiation sounding in outputfolder = same as value in namelist
 
     copy2(exeV, outputD)
-    copy2(soundinV, vmD.join([outputD,"sound_in"]))
+    copy2(soundinV, os.path.join( outputD,"sound_in" ))
 
     if radB:
-        copy2( radiationV, vmD.join([outputD, radiationP]) )
+        copy2( radiationV, os.path.join( outputD, radiationP ))
 
-def createPBSJobScript(jobname = "LES", nproc = 1, nodeNPU = 28, WT = "24:00:00", email = "jaakko.ahola@fmi.fi", rundir = "/lustre/tmp/aholaj/UCLALES-SALSA/bashjob", exe = "les.seq"):
+def writeRunLESFile(rundir = os.path.join( os.environ["WRKDIR"], "/UCLALES-SALSA/bashjob" ), arrayOfLines = [] ):
+    with open( rundir + "/" + "runles.sh", "w") as writer:
+        for ll in arrayOfLines:
+            writer.write(ll)
+            writer.write("\n")
+
+def createPBSJobScript(jobname = "LES", nproc = 1, nodeNPU = 28, WT = "24:00:00", email = "jaakko.ahola@fmi.fi",\
+                        rundir = os.path.join( os.environ["WRKDIR"], "/UCLALES-SALSA/bashjob" ),\
+                        exe = "les.seq"):
 
     lines = []
 
@@ -137,7 +144,37 @@ def createPBSJobScript(jobname = "LES", nproc = 1, nodeNPU = 28, WT = "24:00:00"
     lines.append("aprun -n {0} ./{1} | tee {2}/{3}.log".format( nproc, exe, rundir, jobname ))
     lines.append("exit")
 
-    with open( rundir + "/" + "runles.sh", "w") as writer:
-        for ll in lines:
-            writer.write(ll)
-            writer.write("\n")
+    writeRunLESFile( rundir = rundir, arrayOfLines = lines)
+
+def createSBATCHJobScript(jobname = "LES", nproc = 1, nodeNPU = 28, WT = "24:00:00", email = "jaakko.ahola@fmi.fi",\
+                            rundir = os.path.join( os.environ["WRKDIR"], "/UCLALES-SALSA/bashjob" ),\
+                            exe = "les.seq", projectID = os.environ["projectID"], queue = "parallel", \
+                            envFile = os.path.join(os.environ["SCRIPT"], "submitScripts", "puhti_env_uclales-salsa.bash")  ):
+    lines = []
+
+    lines.append("#!/bin/bash")
+    lines.append("#SBATCH --job-name {0}".format( jobname))
+    lines.append("#SBATCH --account=project_{0}".format( projectID ))
+    lines.append("#SBATCH --partition=fmi")
+    lines.append("#SBATCH -n {0}".format( nproc ))
+    lines.append("#SBATCH -t {0}".format( WT ))
+    lines.append("#SBATCH --output=LES_{0}-%j.out".format( jobname ))
+    lines.append("#SBATCH --error=LES_{0}-%j.err".format( jobname ))
+    lines.append("#SBATCH --mail-type=ALL")
+    lines.append("#SBATCH --mail-user={0}".format( email ))
+    lines.append("#SBATCH -p {0}".format( queue ))
+
+    lines.append("export MPICH_ENV_DISPLAY=1")
+
+    lines.append("# Exit on error")
+    lines.append("set -e")
+
+    lines.append("cd {0}".format( rundir ))
+
+    lines.append("source {0}".format( envFile ))
+
+    lines.append("srun ./{0}".format(exe))
+
+    lines.append("exit")
+
+    writeRunLESFile( rundir = rundir, arrayOfLines = lines)

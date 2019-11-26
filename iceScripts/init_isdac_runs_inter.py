@@ -5,9 +5,12 @@ Created on Wed Jun 26 13:29:01 2019
 
 @author: aholaj
 """
-import submit_uclales_salsa_methods as submitMet
-import sys
 import os
+import sys
+sys.path.insert(0, os.path.join(os.environ["SCRIPT"], "submitScripts"))
+import submit_uclales_salsa_methods as submitMet
+
+
 import getopt
 import f90nml as nml
 
@@ -38,7 +41,7 @@ radiationinputD = binD
 soundinF  = "sound_in3.5"
 namelistF = "NAMELIST_inter"
 # binary name in binD directory
-exeF = "les.mpi.IceDevel_Jaakko_Isdac.IceD.intel.fast"
+exeF = "les.mpi.IceDevel_Jaakko_Isdac_Puhti.IceV1.0.puhtiintel.fast"
 
 # parameters used to determine output location
 case_name = "isdac"
@@ -111,7 +114,7 @@ nmlbaseDict = nml.read(nmlbaseV)
 if debug:
     timeList = [8]
 else:
-    timeList = [8,24]
+    timeList = [8,48]
 
 
 for hours in timeList:
@@ -152,5 +155,5 @@ for hours in timeList:
     submitMet.copyFiles(exeV, soundinV, outputD )
 
     # create bash job script
-    submitMet.createPBSJobScript( jobname = vmF.join( ["LES", "i", str(hours) + "h" ] ), nproc = nproc, WT = walltime, rundir = outputD, exe = exeF)
+    submitMet.createSBATCHJobScript( jobname = vmF.join( ["LES", "i", str(hours) + "h" ] ), nproc = nproc, WT = walltime, rundir = outputD, exe = exeF)
     #######################################################################
