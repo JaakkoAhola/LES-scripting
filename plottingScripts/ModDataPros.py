@@ -19,7 +19,6 @@ import os
 
 import matplotlib.pyplot as plt
 from itertools import cycle
-import matplotlib.patches as mpatches
 import matplotlib.colors as colors
 import seaborn as sns
 
@@ -142,60 +141,6 @@ def laske_minimi_maksimi(nimi,data):
   print('minikoord' + str(minikoord))
   print(' ')
 
-##########################################################
-### handle timeseries data by summing them columnwise  ###
-### 4 dimensions: time, x, y, z                        ###
-##########################################################
-def vertical_sum_timeseries( nimi, data, aika, tulostus = False, piirra = False, uusikuva = True, label = None ):
-    print(' ')
-    print(nimi, 'aikasarja')
-    kokoaika = np.shape(data)[0]
-    aikasarja = np.zeros(kokoaika)
-
-    for time in range(np.shape(data)[0]):
-        for z in  range(np.shape(data)[3]):
-            for y in range(np.shape(data)[2]):
-                for x in range(np.shape(data)[1]):
-                    aikasarja[time] = aikasarja[time] + data[time,x,y,z]
-
-    if tulostus:
-        for time in range(kokoaika):
-            print('ajanhetki: ' + str(aika[time]) + ' ' + ' arvo : ' + str(aikasarja[time]))
-    print(' ')
-
-    ## drawing ##
-
-    uusikuva = ( piirra and uusikuva )
-    plot_alustus() if uusikuva else False
-    plottaa( aika, timeSeries, nimi, 'aika', 'path', label = label)  if piirra else False
-
-##########################################################
-### handle timeseries data by summing them columnwise  ###
-### 5 dimensions: time, x, y, z, bin                   ###
-##########################################################
-def vertical_sum_timeseries_bini( nimi, data, aika, tulostus = False, piirra = False, uusikuva = True, label = None ):
-    print(' ')
-    print(nimi, 'aikasarja')
-    kokoaika = np.shape(data)[0]
-    aikasarja = np.zeros(kokoaika)
-
-    for time in range(np.shape(data)[0]):
-        for z in  range(np.shape(data)[4]):
-            for y in range(np.shape(data)[3]):
-                for x in range(np.shape(data)[2]):
-                    for bini in range(np.shape(data)[1]):
-                        aikasarja[time] = aikasarja[time] + data[time,bini,x,y,z]
-
-    if tulostus:
-        for time in range(kokoaika):
-            print('ajanhetki: ' + str(aika[time]) + ' ' + ' arvo : ' + str(aikasarja[time]))
-    print(' ')
-
-    ## drawing ##
-
-    uusikuva = ( piirra and uusikuva )
-    plot_alustus() if uusikuva else False
-    plottaa( aika, timeSeries, nimi, 'aika', 'path', label = label)  if piirra else False
 
 
 ##########################################################
@@ -255,8 +200,6 @@ def laske_path_aikasarjaXYZ( mixRatData, dn0_data, korkeus, aika = None, muunnos
     timeDim  = np.shape( mixRatData )[0]
     xDim     = np.shape( mixRatData )[1]
     yDim     = np.shape( mixRatData )[2]
-    zDim     = np.shape( mixRatData )[3]
-    nCol     = xDim * yDim
 
     dn0Kork  = dn0_data * korkeus
 
@@ -322,12 +265,10 @@ def laske_path_aikasarjaZ( mixRatData, dn0_data, korkeus, aika, tulostus = False
     mixRatData = mixRatData * 1000.0 # kg/kg -> g/kg # ( timeDim, zdim )
 
     timeDim  = np.shape( mixRatData )[0]
-    zDim     = np.shape( mixRatData )[1]
 
     dn0Kork  = dn0_data * korkeus
 
-    timeSeriesTZ = np.zeros( ( timeDim, zDim ) )
-    timeSeries   = np.zeros(   timeDim         )
+    timeSeries   = np.zeros( timeDim )
 
     timeSeries   = np.dot(mixRatData, dn0Kork)
 
@@ -355,105 +296,6 @@ def laske_path_aikasarjaZ( mixRatData, dn0_data, korkeus, aika, tulostus = False
     plot_alustus() if uusikuva else False
     plottaa( aika, timeSeries, nimi, 'aika [s]', 'path [g/m^2]', label = label)  if piirra else False
 
-##########################################################
-### calculate content of a variable according          ###
-### to the air density (g/m^3)                         ###
-###                                                    ###
-### input variable: mix ratio ( kg / kg )              ###
-### 4 dimensions: time, x, y z                         ###
-##########################################################
-def laske_WC( mixRatData, dn0_data, aika, tulostus = False, piirra = False, uusikuva = True, nimi = 'water content aikasarja', label = None ):
-
-    mixRatData = mixRatData*1000.0 # kg/kg -> g/kg
-
-    timeDim  = np.shape( mixRatData )[0]
-    xDim     = np.shape( mixRatData )[1]
-    yDim     = np.shape( mixRatData )[2]
-    zDim     = np.shape( mixRatData )[3]
-    nCol     = xDim * yDim
-
-    onlyCloudyTXYZ = np.zeros( ( timeDim, xDim, yDim, zDim ) ) #
-
-    timeSeriesTXYZ =  np.zeros( ( timeDim, xDim, yDim, zDim ) )
-    timeSeries     =  np.zeros(   timeDim             )
-
-    timeSeriesTXYZ = np.multiply( mixRatData, dn0_data )
-
-    onlyCloudyTXYZ = np.where( mixRatData > 0.0, 1.0, 0.0)
-
-    timeSeries  = np.sum( np.sum( np.sum( timeSeriesTXYZ, axis = 1), axis = 1), axis = 1 )
-    onlyCloudyT = np.sum( np.sum( np.sum( onlyCloudyTXYZ, axis = 1), axis = 1), axis = 1 )
-
-    #print np.shape(timeSeries)
-    #print np.shape(onlyCloudyT)
-
-    timeSeries = np.where( onlyCloudyT > 0.0, timeSeries / onlyCloudyT , 0.0 )
-
-
-    if tulostus:
-        print(' ')
-        print(nimi)
-        for t in range(timeDim):
-            print('ajanhetki: ' + str(aika[t]) + ' ' + ' arvo : ' + str(timeSeries[t]))
-    print(' ')
-
-    ## drawing ##
-
-    uusikuva = ( piirra and uusikuva )
-    plot_alustus() if uusikuva else False
-    plottaa( aika, timeSeries, nimi, 'aika [s]', 'Content [g/m^3]', label = label)  if piirra else False
-
-#######################################################################
-### calculate number concentration of a variable according          ###
-### to the reference data                                           ###
-###                                                                 ###
-### input variable: mix ratio ( kg / kg )                           ###
-### 4 dimensions: time, x, y z                                      ###
-#######################################################################
-
-############## NEEDS REVISION ############################
-def laske_NumberConcentration( Ndata, refNdata, dn0_data, aika, tulostus = False, uusikuva = True, piirra =False, nimi = 'number concentration', label = None ):
-
-    #dn0_data = dn0_data/1000.0 # kg/m^3 -> kg/l
-
-    timeDim  = np.shape( Ndata )[0]
-    xDim     = np.shape( Ndata )[1]
-    yDim     = np.shape( Ndata )[2]
-    zDim     = np.shape( Ndata )[3]
-    nCol     = xDim * yDim
-
-    onlyCloudyTXYZ = np.zeros( ( timeDim, xDim, yDim, zDim ) ) #
-
-    timeSeriesTXYZ =  np.zeros( ( timeDim, xDim, yDim, zDim ) )
-    timeSeries     =  np.zeros(   timeDim             )
-
-    #timeSeriesTXYZ = np.multiply( Ndata, dn0_data )
-    timeSeriesTXYZ = np.where( Ndata/1000.0    > 1e-10, Ndata, 0.0 )
-    onlyCloudyTXYZ = np.where( refNdata > 1e-10, 1.0  , 0.0 )
-
-
-    timeSeries  = np.sum( np.sum( np.sum( timeSeriesTXYZ, axis = 1), axis = 1), axis = 1 )
-    onlyCloudyT = np.sum( np.sum( np.sum( onlyCloudyTXYZ, axis = 1), axis = 1), axis = 1 )
-
-
-
-    timeSeries = np.where( onlyCloudyT > 0.0, timeSeries / onlyCloudyT , 0.0 )
-
-
-
-    if tulostus:
-
-        print(' ')
-        print(nimi)
-        for t in range(timeDim):
-            print('ajanhetki: ' + str(aika[t]) + ' ' + ' arvo : ' + str(timeSeries[t]))
-        print(' ')
-
-    ## drawing ##
-
-    uusikuva = ( piirra and uusikuva )
-    plot_alustus() if uusikuva else False
-    plottaa( aika, timeSeries, nimi, 'aika [s]', 'Number concentration [#/kg]', label = label)  if piirra else False
 
 
 #######################################################################
