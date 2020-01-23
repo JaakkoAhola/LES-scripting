@@ -7,6 +7,7 @@ Created on Fri Jan 10 13:22:16 2020
 @licence: MIT licence Copyright
 """
 import os
+import pathlib
 import yaml
 
 class FileSystem:
@@ -24,3 +25,6 @@ class FileSystem:
             except yaml.YAMLError as exc:
                 print(exc)
         return output
+    
+    def getAbsoluteFilename(folder, file):
+        return pathlib.Path(folder) / file

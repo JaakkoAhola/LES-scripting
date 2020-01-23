@@ -12,7 +12,7 @@ from InputSimulation import InputSimulation
 
 def prepareIceManuscriptData():
 
-    colorCollection ={
+    colorDict ={
                 "ICE0": "#3cb44b",
                 "ICE1": "#f58231",
                 "ICE2": "#f032e6",
@@ -23,12 +23,14 @@ def prepareIceManuscriptData():
                 "Prognostic": "#e6194B",
                 "BIN": "#000000",
                 "BULK": "#a9a9a9"}
+                
     folder = "/home/aholaj/OneDrive/kuvatesti/"
+    
     manuscriptSimulationData = InputSimulation(
-            folderCollectionYAMLFile="folders.yaml",
-            labelCollectionYAMLFile="labels.yaml",
-            idCollectionYAMLFile = "ids.yaml",
-            colorCollection =  colorCollection,
+            idCollection = "ids.yaml",
+            folderCollection="folders.yaml",
+            labelCollection="labels.yaml",
+            colorSet =  colorDict,
             folder = folder)
     
     manuscriptSimulationData.saveDataFrameAsCSV(folder, "manuscriptSimulationData.csv")
