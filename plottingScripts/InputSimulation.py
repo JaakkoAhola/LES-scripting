@@ -9,7 +9,6 @@ Created on Mon Jan 20 12:28:17 2020
 import numpy
 import pandas
 import pathlib
-import time
 
 from FileSystem import FileSystem
 from Simulation import Simulation
@@ -73,32 +72,3 @@ class InputSimulation:
         self.simulationDataFrame.to_csv(absFile)
         
         return absFile
-    
-def main():
-    if False:
-        colorCollection ={
-                    "ICE0": "#3cb44b",
-                    "ICE1": "#f58231",
-                    "ICE2": "#f032e6",
-                    "ICE3": "#469990",
-                    "ICE4": "#4363d8",
-                    "ICE5": "#800000",
-                    "ICE6": "#000075",
-                    "Prognostic": "#e6194B",
-                    "BIN": "#000000",
-                    "BULK": "#a9a9a9"}
-        folder = "/home/aholaj/OneDrive/kuvatesti/"
-        manuscriptSimulationData = InputSimulation(
-                folderCollectionYAMLFile="folders.yaml",
-                labelCollectionYAMLFile="labels.yaml",
-                idCollectionYAMLFile = "ids.yaml",
-                colorCollection =  colorCollection,
-                folder = folder)
-        
-        manuscriptSimulationData.saveDataFrameAsCSV(folder, "manuscriptSimulationData.csv")
-   
-if __name__ == "__main__":
-    start = time.time()
-    main()
-    end = time.time()
-    print("Script completed in " + str(round((end - start),0)) + " seconds")    
