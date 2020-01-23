@@ -64,15 +64,23 @@ class Data:
         
         return levels, rangePotenssi, minimiPotenssi, maksimiPotenssi
 
-    def getMaskedList(dataarray, listOfValues, initial = False):
-        booleanList = [initial]*numpy.shape(dataarray)[0]
+    # returns a maskedList where bigList values are masked with a boolean value
+    # True if element from bigList closest to an element from shortList
+    # e.g. bigList = [0,1,2,3,4], shortList = [2,4]
+    # returns [False, False, True, False, True]
+    def getMaskedList(bigList : list, shortList, initial = False):
+        bigList = numpy.asarray(bigList)
+        maskedList = [initial]*numpy.shape(bigList)[0]
         
-        indexes = [ numpy.argmin(numpy.abs(elem - dataarray)) for elem in listOfValues ]
+        indexes = [ numpy.argmin(numpy.abs(elem - bigList)) for elem in shortList ]
         
         for i in indexes:
-            booleanList[i] = (not initial)
+            maskedList[i] = (not initial)
         
-        return booleanList
+        return maskedList
+    def getIntergerList(start, end, interval):
+        integerList = [ int(elem) for elem in numpy.arange(start, end + interval*0.1, interval) ]
+        return integerList
 
     def getRelativeChange(dataarray, denominator = None, limiter = 0, relative = True, lahtoarvo = None):
     

@@ -9,212 +9,119 @@ Created on Fri Jan 10 13:17:52 2020
 import matplotlib
 import numpy
 import os
+import pathlib
 import seaborn
 
 from Data import Data
-from Simulation import Simulation
 from FileSystem import FileSystem
+from PlotTweak import PlotTweak
+from Simulation import Simulation
+
 
 from decimal import Decimal
 
-
 class Plot:
     
-    def hideXLabels(ax, xLabelListShowBoolean, xLabelListMajorLineBoolean):
-        k = 0
-        for label in ax.xaxis.get_ticklabels():
-            label.set_visible(xLabelListShowBoolean[k])
-            k = k + 1
-        
-        k = 0
-        for line in ax.xaxis.get_ticklines()[0::2]:
-            if xLabelListMajorLineBoolean[k]:
-                line.set_markersize(matplotlib.rcParams["xtick.major.size"])
-            else:
-                line.set_markersize(matplotlib.rcParams["xtick.minor.size"])
-            k= k + 1
+    def getVerticalLine(ax, x, color = 'k', linestyle = '--' ):
+        ax.axvline( x, color = color , linestyle = linestyle )
 
-        return ax
 
-    def hideYLabels(ax, param):
+    def getHorizontalLine(ax, y, color = 'k', linestyle = '--' ):
+        ax.axhline( y, color = color , linestyle = linestyle )
     
-        k = 0
-        for label in ax.yaxis.get_ticklabels():
-            if numpy.mod(k,param) != 0:
-                label.set_visible(False)
-            k+=1
+    
+    def getTimeseries(ax,
+                      simulation : Simulation,
+                      muuttuja,
+                      conversionFactor = 1.0):
+        if isinstance(simulation, list):
+            for simulationInstance in simulation:
+                ax = Plot.getTimeseries(ax, simulationInstance, muuttuja, conversionFactor)
+            return ax
+        
+        ts = simulation.getTSDataset()
+        try:
+            dataset = ts[muuttuja]
+        except KeyError:
+            print("KeyError")
+            return None
+        
+        # conversion
+        dataset = dataset*conversionFactor
+        
+        dataset.plot(ax = ax,
+                     color = simulation.getColor(),
+                     label =  simulation.getLabel(),
+                     linewidth = simulation.getLineWidth())
         
         return ax
-        
-    def hideColorbarXLabels(cbar, colorbarLabelListShowBoolean):
-        k = 0
-        for label in cbar.ax.xaxis.get_ticklabels():
-            label.set_visible(colorbarLabelListShowBoolean[k])
-            k = k + 1
-        
-        return cbar
     
-    
-    def hideColorbarYLabels(cbar, colorbarLabelListShowBoolean):
-        k = 0
-        for label in cbar.ax.yaxis.get_ticklabels():
-            label.set_visible(colorbarLabelListShowBoolean[k])
-            k = k + 1
-    
-    def setXTicksLabelsAsTime(ax, timeHvalues, tickInterval = 16, unit = "h", startPoint = 0,  xLabelListShow = None, xLabelListMajorLine = None, setXlabel = True):
-        first = timeHvalues[0]
-        last = timeHvalues[-1]
-        xticks = numpy.arange(first,last+0.1, 0.5) 
-        #xticks = xticks[::tickInterval]
-        xticklabels = [ str(int(round(elem,1))) for elem in list(xticks) ]
-        #print(xticks)
-        ax.set_xticks( xticks )
-        ax.set_xticklabels(xticklabels)
-        
-        timesize = numpy.shape(xticks)[0]
-        #####################
-        if xLabelListShow is None:
-            xLabelListShowBoolean = [False]*timesize
-            #timesize = numpy.shape(timeHvalues)[0]
-            
-            for i in range(timesize):
-                if numpy.mod(i, tickInterval) == 0:
-                    xLabelListShowBoolean[i] = True
-        else:
-            xLabelListShowBoolean = Data.getMaskedList( xticks, xLabelListShow)
-        #############################
-        if xLabelListMajorLine is None:
-            xLabelListMajorLineBoolean = [False]*timesize
-            
-            for i in range(timesize):
-                if numpy.mod(i, tickInterval) == 0:
-                    xLabelListMajorLineBoolean[i] = True
-        else:
-            xLabelListMajorLineBoolean = Data.getMaskedList( xticks, xLabelListMajorLine)
-        
-            
-        ax = Plot.hideXLabels(ax, xLabelListShowBoolean, xLabelListMajorLineBoolean)
-        
-        if setXlabel:
-            ax.set_xlabel(r"$\mathbf{time (" + unit + ")}$") 
-        else:
-            ax.set_xlabel(None)
-        ax.set_xlim( first ,last )
-    
-        return ax
-    
-    def getTicks(start, end, interval):
-        return  [ int(elem) for elem in numpy.arange(start, end + interval*0.1, interval) ]
-    
-    def getLabels(ticks):
-        return list(map(str,ticks))
-    
-    def getUnitLabel(label, unit, useBold = False):
-        if useBold:
-            boldingStart = "\mathbf{"
-            boldingEnd  = "}"
-        else:
-            boldingStart = ""
-            boldingEnd   = ""
-        
-        return r"$" +boldingStart +  "{" + label +  "}{\ } ( " + unit +      ")" + boldingEnd + "$"
-        
-    
-    def getLogaritmicTicks(start, end, includeFives = False):
-        tstart = -17
-        tend = -9
-        logaritmicTicks = numpy.arange(tstart, tend)
-        if includeFives:
-            fives = numpy.arange(tstart+numpy.log10(5), tend)
-            logaritmicTicks = numpy.sort(numpy.concatenate((logaritmicTicks,fives)))
-        
-        return logaritmicTicks
-        
-    
+    #REVISEu
     def getTimeseriesOfProfile(ax,
                          simulation : Simulation,
                          muuttuja,
-                         useContours = True,
-                         useColorBar = True,
-                         showXaxisLabels = True,
-                         showXLabel = True,
-                         yticks = None,
                          levels = None,
-                         timeStartH = 0., timeEndH = 48,
-                         uusikuva = True, title = None, colors = None, plotSpinup = True):
+                         useLogaritmic = False,
+                         useColorBar = False,
+                         colors = None):
 
         ps = simulation.getPSDataset()
-        ts = simulation.getTSDataset()
-        
-        if ps is None:
-            return "FileNotFound"
-        
-        timeStartInd = Data.getClosestIndex( ps.time.values, timeStartH*3600 )
-        timeEndInd   = Data.getClosestIndex( ps.time.values, timeEndH*3600 )
-        ps = ps.isel(time = slice(timeStartInd,timeEndInd))
-        ts = ts.isel(time = slice(timeStartInd,timeEndInd))
-        ps = ps.assign_coords(time = (ps.time / 3600))
-        ts = ts.assign_coords(time = (ts.time / 3600))
         
         try:
             data = ps[muuttuja]
         except KeyError:
+            print("KeyError", simulation, muuttuja, "Plot.getTimeseriesOfProfile")            
             return
         
-        
-        if levels is None:
-            levels, rangePotenssi, minimiPotenssi, maksimiPotenssi = Data.getLogScale(data.values)
+        if useLogaritmic:
+            if levels is None:
+                levels, rangePotenssi, minimiPotenssi, maksimiPotenssi = Data.getLogScale(data.values)
+                levels = rangePotenssi
             
-            levels = rangePotenssi#numpy.power(10,levels)
-            print(levels, minimiPotenssi, maksimiPotenssi, rangePotenssi)
+            data.values  = numpy.log10(data.values)
+            
+        im = data.plot.contourf("time","zt", ax = ax, levels=levels, add_colorbar = useColorBar, colors = colors) #
         
-        xLabelListShow = numpy.arange(0, 48+1, 8)
+        return ax, im, levels
+    
+    def getContourLine(ax,
+                       simulation : Simulation,
+                       muuttuja,
+                       value,
+                       color = "black",
+                       epsilon = 1e-12):
+        ps = simulation.getPSDataset()
+        try:
+            data = ps[muuttuja]
+        except KeyError:
+            print("KeyError", simulation, muuttuja, "Plot.getContourLine")
+            return
         
-        xLabelListMajorLine = numpy.arange(4, 48+1, 4)
+        data.plot.contour(x="time", y="zt",ax=ax, colors = color, vmin = value - epsilon , vmax = value + epsilon)
         
-        ax = Plot.setXTicksLabelsAsTime(ax, ps.time.values, xLabelListShow = xLabelListShow, xLabelListMajorLine = xLabelListMajorLine)
-        if yticks is not None:
-            ax.set_yticklabels( list(map(str, yticks)))
-        data.values  = numpy.log10(data.values)
-        im = data.plot.contourf("time","zt", ax = ax, levels=levels, add_colorbar = False, colors = colors) #
-        
-        if useContours:
-            ps.P_RHi.plot.contour(x="time", y="zt",ax=ax, colors ="black", vmin = 100-1e-12, vmax = 100 + 1e-12)#e6194B
-            ts.zb.where(ts.zb>0).plot(ax=ax, color="#f58231") 
-        
-        if useColorBar:
-            cb = matplotlib.pyplot.colorbar(im, ticks = levels, orientation='horizontal', pad = 0.22) #, pad=0.21
+        return ax
+    
+    def getColorBar(im, ax, levels = None):
+        cb = matplotlib.pyplot.colorbar(im, cax = ax, ticks = levels, orientation='horizontal') #, pad=0.21
+        if levels is not None:
             cb.ax.set_xticklabels([r"$10^{" + str(int(elem)) + "}$" for elem in levels]) 
             
             colorbarLabelListShowBoolean = Data.getIntegerExponentsAsBoolean( levels )
-            cb = Plot.hideColorbarXLabels(cb, colorbarLabelListShowBoolean)
+            cb = PlotTweak.hideColorbarXLabels(cb, colorbarLabelListShowBoolean)
             cb.ax.tick_params(labelsize=36)
-        
-        ax.set_yticks( numpy.arange(0, 1001, 250))
-       
-        if not showXaxisLabels:
-            ax.set_xticklabels([])
-        
-        if showXLabel:    
-            matplotlib.pyplot.xlabel(r"$\mathbf{time (h)}$")
-        else:
-            matplotlib.pyplot.xlabel(None)
-            
-        matplotlib.pyplot.ylabel(r"$\mathbf{height (m)}$")
-        matplotlib.pyplot.xlim( 0 ,data["time"].values[-1] )
-        matplotlib.pyplot.ylim(0, 1000)
-        if plotSpinup:
-            matplotlib.pyplot.axvline(2, color = "black", linestyle = "--")
-        if title is None:
-            title = data.longname
-        
-           
-        matplotlib.pyplot.title(title)
-        
-        #data.plot.contourf("time","zt")#, levels=levels, cbar_kwargs={"ticks": levels})
-        
-        return ax, im
+    
+    def getScientificColormap(cmap_name, scm_base_dir = os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/", reverse = False):
 
+        cmap_file = pathlib.Path(scm_base_dir) / cmap_name / (cmap_name+'.txt')
+
+        cmap_data = numpy.loadtxt(cmap_file)
+
+        if reverse:
+            cmap_data = numpy.flip(cmap_data)
+    
+        return matplotlib.colors.LinearSegmentedColormap.from_list(cmap_name, cmap_data)
+    
+    # REVISE
     def getTimeseriesOfProportions(axes,
                                    simulation : Simulation,
                                    muuttuja,
@@ -348,7 +255,7 @@ class Plot:
             else:
                 setXlabel =False
             
-            ax = Plot.setXTicksLabelsAsTime(ax, ps.time.values, xLabelListShow = xLabelListShow, xLabelListMajorLine = xLabelListMajorLine, setXlabel = setXlabel)
+            ax = PlotTweak.setXTicksLabelsAsTime(ax, ps.time.values, xLabelListShow = xLabelListShow, xLabelListMajorLine = xLabelListMajorLine, setXlabel = setXlabel)
             
             if bini in [0,1]:
                 ax.set_xticklabels([])
@@ -359,7 +266,8 @@ class Plot:
             tick.set_visible(True)
         
         return axes
-        
+    
+    # REVISE
     def getTimeseriesOfBinMass(ax,
                               simulation : Simulation,
                               muuttuja,
@@ -494,13 +402,14 @@ class Plot:
         heightTosi = str(int(zt.sel(zt = height, method = 'nearest' ).values))
         matplotlib.pyplot.title("zt =" + heightTosi + "(m)" )
     #    print(time.values)
-        ax = Plot.setXTicksLabelsAsTime(ax, plottable["time"].values, startPoint=8)
+        ax = PlotTweak.setXTicksLabelsAsTime(ax, plottable["time"].values, startPoint=8)
     
         #matplotlib.pyplot.ylim(0, 5)
         ax.set_yscale('log')
         
         return ax
     
+    # REVISE
     def getSizeDistributionHeightTimeSpecified(ax,
                                                simulation : Simulation,
                                                muuttuja,

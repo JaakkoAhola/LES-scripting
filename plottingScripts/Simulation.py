@@ -12,19 +12,42 @@ import xarray
 
 class Simulation:
     
-    def __init__(self, folder, namelabel, color):
+    def __init__(self, folder, label, color, linewidth = None):
         self.folder = pathlib.Path(folder)
-        self.namelabel = namelabel
+        self.label = label
         self.color = color
-            
+        self.nc = None
+        self.ps = None
+        self.ts = None
+        self.linewidth = linewidth
+        
+    def getColor(self):
+        return self.color
+    
+    def getLabel(self):
+        return self.label
+    
+    def getLineWidth(self):
+        return self.linewidth
+        
     def getNCDataset(self):
-        return self._getDataset("nc")
+        if self.nc is None:
+            self.nc = self._getDataset("nc")
+                
+        return self.nc
     
     def getPSDataset(self):
-        return self._getDataset("ps")
+        if self.ps is None:
+            self.ps = self._getDataset("ps")
+        
+        return self.ps
     
     def getTSDataset(self):
-        return self._getDataset("ts")
+        if self.ts is None:
+            self.ts = self._getDataset("ts")
+        
+        
+        return self.ts
     
     def _getDataset(self, ncMode):
     
@@ -42,9 +65,10 @@ class Simulation:
         if fileAbs is not None:
             dataset = xarray.open_dataset(fileAbs)
         else:
-            dataset = None
+            raise FileNotFoundError(ncMode, "file not found from", self.folder)
         
         return dataset
+
     
     def getEntrainment(self,
                        divergence = 5.e-6):
@@ -72,3 +96,19 @@ class Simulation:
         else:
             rr = numpy.poly1d(z_incloud)(h)
         return rr
+
+    
+    def setUnitToLatexMathMode(dataset):
+        dataset.attrs["units"] = r'$' + dataset.attrs["units"] + '$'
+        return dataset
+    
+    def setTimeCoordToHours(self):
+        if self.nc is not None:
+            self.nc = self.nc.assign_coords(time = (self.nc.time / 3600))
+        if self.ps is not None:
+            self.ps = self.ps.assign_coords(time = (self.ps.time / 3600))
+        if self.ts is not None:
+            self.ts = self.ts.assign_coords(time = (self.ts.time / 3600))
+            
+    def setLineWidth(self, linewidth):
+        self.linewidth = linewidth
