@@ -136,3 +136,22 @@ class InputSimulation:
         self.simulationDataFrame.to_csv(absFile)
         
         return absFile
+    
+    def getEmulatorFileList(superRootFolder, emulatorSet = None, listOfCases = None):
+        
+        if emulatorSet is not None:
+            absolutepath = pathlib.Path(superRootFolder) / emulatorSet
+        else:
+            absolutepath = pathlib.Path(superRootFolder)
+            
+            
+        if listOfCases is None:
+            fileList =  sorted(absolutepath.glob("emul???/"))
+        else:
+            fileList = []
+            for i in listOfCases:
+                case = absolutepath / ( "emul" + "{:03d}".format(i))
+                
+                if case.is_dir():
+                    fileList.append(case)
+        return fileList
