@@ -155,3 +155,20 @@ class InputSimulation:
                 if case.is_dir():
                     fileList.append(case)
         return fileList
+    
+    def getEmulatorIDlist(fileList, dtype="|S6"):
+        idList = numpy.zeros( numpy.shape( fileList ), dtype=dtype )
+        
+        for ind,file in enumerate(fileList):
+            emulatorSet = file.parts[-2]
+            emulatorSetSplit = emulatorSet.split("_")
+            lvl = emulatorSetSplit[-2][-1]
+            nightTimeDayTime = emulatorSetSplit[-1][0].upper()
+            caseNumber = file.parts[-1][4:]
+            
+            idList[ind] = lvl + nightTimeDayTime + "_" + caseNumber
+            
+        return list(idList)
+            
+        
+    

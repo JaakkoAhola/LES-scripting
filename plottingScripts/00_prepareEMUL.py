@@ -9,26 +9,59 @@ Created on Thu Jan 23 14:41:12 2020
 import time
 
 from InputSimulation import InputSimulation
+from Colorful import Colorful
+def changeToStringList(array):
+    return list(map(str, array))
 
 def prepareEMULData():
 
                 
     rootFolderOfEmulatorSets = "/home/aholaj/mounttauskansiot/eclairmount"
     
-    fileListLVL3Night = InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, "case_emulator_DESIGN_v3.0.0_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL3_night" )
-    fileListLVL3Day   = InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, "case_emulator_DESIGN_v3.1.0_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL3_day" )
+    folderList = {"LVL3Night" :"case_emulator_DESIGN_v3.0.0_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL3_night",
+                "LVL3Day"   :  "case_emulator_DESIGN_v3.1.0_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL3_day" ,
+                "LVL4Night" :  "case_emulator_DESIGN_v3.2_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL4_night" ,
+                "LVL4Day"   : "case_emulator_DESIGN_v3.3_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL4_day" 
+                }
     
-    fileListLVL4Night = InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, "case_emulator_DESIGN_v3.2_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL4_night" )
-    fileListLVL4Day   = InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, "case_emulator_DESIGN_v3.3_LES_ECLAIR_branch_ECLAIRv2.0.cray.fast_LVL4_day" )
+    fileLists = {
+                "LVL3Night" : InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, folderList["LVL3Night"] ),
+                "LVL3Day"   : InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, folderList["LVL3Day"] ),
+                "LVL4Night" : InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, folderList["LVL4Night"] ),
+                "LVL4Day"   : InputSimulation.getEmulatorFileList(rootFolderOfEmulatorSets, folderList["LVL4Day"] )
+                }
+    
+    idLists = {
+                "LVL3Night" : InputSimulation.getEmulatorIDlist(fileLists["LVL3Night"] ),
+                "LVL3Day"   : InputSimulation.getEmulatorIDlist(fileLists["LVL3Day"] ),
+                "LVL4Night" : InputSimulation.getEmulatorIDlist(fileLists["LVL4Night"] ),
+                "LVL4Day"   : InputSimulation.getEmulatorIDlist(fileLists["LVL4Day"] )
+            }
+    
+    labelLists = idLists
+    
+    colorLists = {
+                "LVL3Night" : Colorful.getIndyColorList( len(fileLists["LVL3Night"]) ),
+                "LVL3Day"   : Colorful.getIndyColorList( len(fileLists["LVL3Day"]) ),
+                "LVL4Night" : Colorful.getIndyColorList( len(fileLists["LVL4Night"]) ),
+                "LVL4Day"   : Colorful.getIndyColorList( len(fileLists["LVL4Day"]) )
+            }
     
     
-    emulatorLVL3Day = InputSimulation(
-            idCollection = "ids.yaml",
-            folderCollection="folders.yaml",
-            labelCollection="labels.yaml",
-            )
+    # MISSING INPUT
+    simulationData = {
+                "LVL3Night" : InputSimulation(  ),
+                "LVL3Day"   : InputSimulation(  ),
+                "LVL4Night" : InputSimulation(  ),
+                "LVL4Day"   : InputSimulation(  )
+            }
+#    emulatorLVL3Day = InputSimulation(
+#            idCollection = "ids.yaml",
+#            folderCollection="folders.yaml",
+#            labelCollection="labels.yaml",
+#            )
     
-    manuscriptSimulationData.saveDataFrameAsCSV(folder, "manuscriptSimulationData.csv")
+#    manuscriptSimulationData.saveDataFrameAsCSV(folder, "manuscriptSimulationData.csv")
 
 def main():
     prepareEMULData()
@@ -38,8 +71,3 @@ if __name__ == "__main__":
     main()
     end = time.time()
     print("Script completed in " + str(round((end - start),0)) + " seconds")       
-if __name__ == "__main__":
-    start = time.time()
-    main()
-    end = time.time()
-    print("Script completed in " + str(round((end - start),0)) + " seconds")

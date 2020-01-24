@@ -14,7 +14,27 @@ import seaborn
 
 class Colorful:
     # if snsColorPalette and matplotlibColorMap are None and colorNumber < 21 use distinctColorlist
-    def __init__( self, colorNumber = None, colorList = None,
+    
+    def __init__(self, colorNumber = None, colorList = None,
+                 shuffling = False,
+                 blindnessLevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, useGrey = False,
+                 snsColorPalette = None, 
+                 matplotlibColorMap = None, # e.g. matplotlib.pyplot.cm.gist_ncar
+                 matplotlibLimiter = 0.95
+                 ):
+        
+        self.colorList = Colorful.getIndyColorList(colorNumber, colorList,
+                                                   shuffling,
+                                                   blindnessLevel, useWhite, useBlack, useBeige, useLavender, useGrey,
+                                                   snsColorPalette, 
+                                                   matplotlibColorMap, # e.g. matplotlib.pyplot.cm.gist_ncar
+                                                   matplotlibLimiter)
+        
+    
+    def getColorList(self):
+        return self.colorList
+    
+    def getIndyColorList( colorNumber = None, colorList = None,
                  shuffling = False,
                  blindnessLevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, useGrey = False,
                  snsColorPalette = None, 
@@ -23,31 +43,28 @@ class Colorful:
                  ):
         
         if colorList is not None:
-            self.colorList = colorList
+            colorList = colorList
         
         nmax = 22 - int(not useWhite) - int( not useBlack) - int( not useBeige) - int( not useLavender) - int( not useGrey)
 
         if snsColorPalette is None and matplotlibColorMap is None and colorNumber < nmax:
-            self.colorList = Colorful.getDistinctColorList(colorNumber, blindnessLevel = blindnessLevel,
+            colorList = Colorful.getDistinctColorList(colorNumber, blindnessLevel = blindnessLevel,
                                                             useWhite = useWhite, useBlack = useBlack,
                                                             useBeige = useBeige, useLavender = useLavender,
                                                             useGrey = useGrey)
         elif snsColorPalette is None and matplotlibColorMap is None and colorNumber > nmax:
-            self.colorList = seaborn.color_palette( snsColorPalette, colorNumber )
+            colorList = seaborn.color_palette( snsColorPalette, colorNumber )
         elif snsColorPalette is not None:
-            self.colorList = seaborn.color_palette( snsColorPalette, colorNumber )
+            colorList = seaborn.color_palette( snsColorPalette, colorNumber )
         elif matplotlibColorMap is not None:
-            self.colorList = [ matplotlibColorMap(i) for i in numpy.linspace(0, matplotlibLimiter, colorNumber) ]
+            colorList = [ matplotlibColorMap(i) for i in numpy.linspace(0, matplotlibLimiter, colorNumber) ]
             
 
         if shuffling:
-            self.colorList = numpy.random.shuffle(colorList)
+            colorList = numpy.random.shuffle(colorList)
             
-    def getColorList(self):
-        return self.colorList
+        return colorList
     
-    def updatColorList(self, newColorList):
-        self.colorList = newColorList
     
     def getScientificColormap(cmap_name, scm_base_dir = os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/", reverse = False):
 
