@@ -6,6 +6,7 @@ Created on Fri Jan 10 13:20:28 2020
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
+import datetime
 import math
 import numpy
 
@@ -111,3 +112,5 @@ class Data:
             returnable = str(variable)
         
         return returnable
+    def date(format="%Y-%m-%d"):
+        return datetime.datetime.utcnow().strftime(format)
