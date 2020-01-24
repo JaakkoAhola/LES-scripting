@@ -6,7 +6,10 @@ Created on Fri Jan 24 13:33:54 2020
 @author: Jaakko Ahola, Finnish Meteorological Institute
 @licence: MIT licence Copyright
 """
+import matplotlib
 import numpy
+import os
+import pathlib
 import seaborn
 
 class Colorful:
@@ -45,6 +48,17 @@ class Colorful:
     
     def updatColorList(self, newColorList):
         self.colorList = newColorList
+    
+    def getScientificColormap(cmap_name, scm_base_dir = os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/", reverse = False):
+
+        cmap_file = pathlib.Path(scm_base_dir) / cmap_name / (cmap_name+'.txt')
+
+        cmap_data = numpy.loadtxt(cmap_file)
+
+        if reverse:
+            cmap_data = numpy.flip(cmap_data)
+    
+        return matplotlib.colors.LinearSegmentedColormap.from_list(cmap_name, cmap_data)    
     
     def getDistinctColorList(elements, blindnessLevel = 4, useBlack = True, useWhite = False, useLavender = False, useBeige = False, useGrey = False):
         

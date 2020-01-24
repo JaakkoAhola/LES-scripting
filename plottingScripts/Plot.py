@@ -110,17 +110,6 @@ class Plot:
             cb = PlotTweak.hideColorbarXLabels(cb, colorbarLabelListShowBoolean)
             cb.ax.tick_params(labelsize=36)
     
-    def getScientificColormap(cmap_name, scm_base_dir = os.environ["SCRIPT"] + "/" + "ScientificColourMaps5/", reverse = False):
-
-        cmap_file = pathlib.Path(scm_base_dir) / cmap_name / (cmap_name+'.txt')
-
-        cmap_data = numpy.loadtxt(cmap_file)
-
-        if reverse:
-            cmap_data = numpy.flip(cmap_data)
-    
-        return matplotlib.colors.LinearSegmentedColormap.from_list(cmap_name, cmap_data)
-    
     # REVISE
     def getTimeseriesOfProportions(axes,
                                    simulation : Simulation,
