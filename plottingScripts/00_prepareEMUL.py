@@ -42,7 +42,10 @@ def prepareEMULData():
                                                folderCollection= fileLists[case],
                                                labelCollection = labelLists[case],
                                                colorSet= colorLists[case])
-        
+    
+    csvFolder = "/home/aholaj/OneDrive/000_WORK/000_ARTIKKELIT/001_Manuscript_LES_emulator/data"
+    for case in list(simulationData):
+        simulationData[case].saveDataFrameAsCSV(csvFolder, case + ".csv")
 #    manuscriptSimulationData.saveDataFrameAsCSV(folder, "manuscriptSimulationData.csv")
 
 def main():
