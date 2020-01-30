@@ -88,7 +88,7 @@ class Figure:
         self.fig.subplots_adjust( hspace=hspace, wspace = wspace, left = left, right = right, top = top, bottom = bottom)
         
     #, padding = 0.06, bbox_inches = "tight"
-    def save(self, file_extension = ".png", useTight = True, close = True):
+    def save(self, file_extension = ".pdf", useTight = True, close = True):
         if useTight:
             self.fig.tight_layout()
             

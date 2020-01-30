@@ -34,6 +34,9 @@ class Colorful:
     def getColorList(self):
         return self.colorList
     
+    def stringToFloatTuple(string):
+        return tuple(map(float, string.replace("(", "").replace(")","").split(",")))
+    
     def getIndyColorList( colorNumber = None, colorList = None,
                  shuffling = False,
                  blindnessLevel = 4, useWhite = False, useBlack = True, useBeige = False, useLavender = False, useGrey = False,
@@ -62,6 +65,9 @@ class Colorful:
 
         if shuffling:
             colorList = numpy.random.shuffle(colorList)
+        
+        for ind, value in enumerate(colorList):
+            colorList[ind] = matplotlib.colors.to_hex(value)
             
         return colorList
     

@@ -156,8 +156,8 @@ class InputSimulation:
                     fileList.append(case)
         return fileList
     
-    def getEmulatorIDlist(fileList, dtype="|S6"):
-        idList = numpy.zeros( numpy.shape( fileList ), dtype=dtype )
+    def getEmulatorIDlist(fileList):
+        idList =  [None] * len(fileList)
         
         for ind,file in enumerate(fileList):
             emulatorSet = file.parts[-2]
@@ -169,6 +169,20 @@ class InputSimulation:
             idList[ind] = lvl + nightTimeDayTime + "_" + caseNumber
             
         return list(idList)
-            
+    
+    def getEmulatorDesignAsDataFrame(folder, identifierPrefix, file = "design.csv"):
+        absolutePath = pathlib.Path(folder) / file
+        
+        designDataframe = pandas.read_csv(absolutePath)
+        
+        idList = ["{0}_{1:03d}".format(identifierPrefix, i) for i in range(1,designDataframe.shape[0]+1)]
+        
+        designDataframe["ID"] = idList
+        designDataframe.set_index("ID")
+        del designDataframe["Unnamed: 0"]
+        
+        return designDataframe
+    
+    
         
     
