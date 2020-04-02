@@ -98,7 +98,7 @@ class InputSimulation:
     
     def getSimulationCollection(simulationDataFrame):
         simulationCollection = {}
-        for i in range(numpy.size(simulationDataFrame["ID"])):
+        for i in range(simulationDataFrame.shape[0]):
             simulationCollection[ simulationDataFrame.iloc[i]["ID"] ] = Simulation( simulationDataFrame.iloc[i]["FOLDER"],
                                                                                     simulationDataFrame.iloc[i]["LABEL"],
                                                                                     simulationDataFrame.iloc[i]["COLOR"])

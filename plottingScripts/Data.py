@@ -106,6 +106,40 @@ class Data:
     
         return zero
     
+    def sortDictionary(dictionary : dict):
+        sortedDict = {k: v for k, v in sorted(dictionary.items(), key=lambda item: item[1])}
+        return sortedDict
+    
+    def getHighAndLowTail(dictionary : dict,
+                fraction : float):
+        
+        return { **Data.getLowTail(dictionary, fraction), **Data.getHighTail(dictionary, fraction) }
+    
+    def getLowTail(dictionary : dict,
+                fraction : float):
+        
+        tailDict = {}
+        keyList = list(dictionary)[:int(len(dictionary)*fraction)]
+        
+        for key in keyList:
+            tailDict[key] = dictionary[key]
+        
+        return tailDict
+    
+    def getHighTail(dictionary : dict,
+                fraction : float):
+        
+        tailDict = {}
+        keyList = list(dictionary)[-int(len(dictionary)*fraction):]
+        
+        for key in keyList:
+            tailDict[key] = dictionary[key]
+        
+        return tailDict
+    
+    def emptyDictionaryWithKeys(keylist : list, value = {}):
+        return dict.fromkeys(keylist, value)
+    
     def toString(variable):
         returnable = ""
         if variable is not None:

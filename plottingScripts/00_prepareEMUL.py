@@ -9,12 +9,14 @@ Created on Thu Jan 23 14:41:12 2020
 import pandas
 import pathlib
 import time
-
+import sys
 from InputSimulation import InputSimulation
 from Colorful import Colorful
 def changeToStringList(array):
     return list(map(str, array))
 
+sys.path.append("/home/aholaj/OneDrive/000_WORK/000_Codex/LES-scripting/emulatorScripts/")
+import ECLAIR_calcs
 
 def prepareEMULData():
 
@@ -59,7 +61,21 @@ def prepareEMULData():
         designData[case] = InputSimulation.getEmulatorDesignAsDataFrame( pathlib.Path(rootFolderOfEmulatorSets) / folderList[case], identifierPrefix[case])
         joinedDF = pandas.merge( simulationData[case].getSimulationDataFrame(), designData[case], on="ID")
         joinedDF = joinedDF.set_index("ID")
+        
+        pres0= 1017.8
+        pblh_m_list  = [None]*joinedDF.shape[0]
+        for i in range(joinedDF.shape[0]):
+            tpot_pbl = joinedDF.iloc[i]["tpot_pbl"]
+            lwp = joinedDF.iloc[i]["lwp"]
+            pblh = joinedDF.iloc[i]["pblh"]
+            q_pbl      = ECLAIR_calcs.solve_rw_lwp( pres0*100., tpot_pbl,lwp*0.001, pblh*100. )  # kg/kg        
+            lwp_apu, cloudbase, pblh_m, clw_max = ECLAIR_calcs.calc_lwp( pres0*100., tpot_pbl , pblh*100., q_pbl )
+            pblh_m_list[i] = pblh_m
+        joinedDF["pblh_m"] = pblh_m_list
         simulationData[case].setSimulationDataFrame( joinedDF )
+    
+    
+    
     
     
     csvFolder = "/home/aholaj/OneDrive/000_WORK/000_ARTIKKELIT/001_Manuscript_LES_emulator/data"

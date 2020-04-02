@@ -232,11 +232,11 @@ class PlotTweak:
     def setAxesOff(ax):
         ax.axis('off')
 
-    def useLegend(ax = None):
+    def useLegend(ax = None, loc = "best"):
         if ax is None:
-            matplotlib.pyplot.legend()
+            matplotlib.pyplot.legend(loc = loc)
         else:
-            ax.legend()    
+            ax.legend(loc = loc)    
     def setLegendSimulation(ax, simulationList, loc = "center"):
         collectionOfLabelsColors = {}
         for simulation in simulationList:
